@@ -8,9 +8,11 @@ django = "*"
 pillow = "*"
 django-jsoneditor = "*"
 python-dotenv = "*"
+social-auth-app-django = "*"
 
 [dev-packages]
 autopep8 = "*"
+djlint = "*"
 
 [requires]
 python_version = "3.10"

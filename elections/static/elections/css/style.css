@@ -1,0 +1,11 @@
+:root {
+    --pup: #800000;
+}
+
+#oes-topbar {
+    font-size: 0.7rem;
+}
+
+.bg-pup {
+    background-color: var(--pup);
+}
