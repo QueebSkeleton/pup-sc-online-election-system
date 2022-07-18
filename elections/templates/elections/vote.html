@@ -1,4 +1,158 @@
-{% extends "elections/base.html" %}
+{% extends "elections/base.html" %} {% load static %} {# Content #} {% block content %}
+<html>
 
-{# Content #}
-        {% block content %}tite{% endblock content %}
+<style>
+    h3 {
+        text-align: center;
+        font-size: 56px;
+        font-family: Cambria;
+    }
+    
+    #cont {
+        border: 3px solid grey;
+        border-radius: 8px;
+        margin-top: 10px;
+        margin-bottom: 40%;
+        padding-top: 10px;
+        margin-left: 40px;
+        margin-right: 40px;
+        padding-bottom: 50px;
+    }
+    
+    ul {
+        list-style-type: none;
+    }
+    
+    li {
+        display: inline-block;
+    }
+    
+    input[type="checkbox"][id^="cb"] {
+        display: none;
+    }
+    
+    label {
+        border: 1px solid #fff;
+        padding: 10px;
+        display: block;
+        position: relative;
+        margin: 10px;
+        cursor: pointer;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    label::before {
+        background-color: white;
+        color: white;
+        content: " ";
+        display: block;
+        border-radius: 50%;
+        border: 1px solid grey;
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        line-height: 28px;
+        transition-duration: 0.4s;
+        transform: scale(0);
+    }
+    
+    label img {
+        height: 100px;
+        width: 125px;
+        transition-duration: 0.2s;
+        transform-origin: 50% 50%;
+        border-radius: 50%;
+        align-content: center;
+        margin-left: 15px;
+        margin-right: 10px;
+    }
+    
+     :checked+label {
+        border-color: #ddd;
+    }
+    
+     :checked+label::before {
+        content: "✓";
+        background-color: grey;
+        transform: scale(1);
+    }
+    
+     :checked+label img {
+        transform: scale(0.9);
+        box-shadow: 0 0 5px #333;
+        z-index: -1;
+    }
+</style>
+
+<body>
+    <h3>Choose your Candidate</h3>
+    <div id="cont">
+        <center>
+            <ul>
+                <li><input type="checkbox" id="cb1" />
+                    <label for="cb1"><img src="{% static 'elections/img/default-pic.png' %}" />Tine, Celes</label>
+                </li>
+                <li><input type="checkbox" id="cb2" />
+                    <label for="cb2"><img src="{% static 'elections/img/default-pic.png' %}" />Cunana, Paul</label>
+                </li>
+                <li><input type="checkbox" id="cb3" />
+                    <label for="cb3"><img src="{% static 'elections/img/default-pic.png' %}" />Juliana, Elizabeth</label>
+                </li>
+                <li><input type="checkbox" id="cb4" />
+                    <label for="cb4"><img src="{% static 'elections/img/default-pic.png' %}" />Dela Cruz, Juan</label>
+                </li>
+            </ul>
+        </center>
+        <div class="container">
+
+            <center>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="buttonConfirm">
+              Submit Vote
+            </button>
+            </center>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure about your vote?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock content %} >>>>>>> Stashed changes
