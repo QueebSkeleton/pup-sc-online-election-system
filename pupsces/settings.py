@@ -119,6 +119,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+LOGIN_URL = '/'
+
 # Social Auth App
 
 SOCIAL_AUTH_AZUREAD_OAUTH2_KEY = os.environ['SOCIAL_AUTH_AZUREAD_OAUTH2_KEY']

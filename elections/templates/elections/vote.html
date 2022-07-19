@@ -1,10 +1,9 @@
-{% extends "elections/base.html" %} {% load static %} {# Content #} {% block content %}
-<html>
-
-<style>
-    h3 {
-        text-align: center;
-        font-size: 56px;
+{% extends "elections/base.html" %}
+{% load static %}
+{# Content #}
+{% block content %}
+    <style>
+    #vote-heading {
         font-family: Cambria;
     }
     
@@ -19,15 +18,15 @@
         padding-bottom: 50px;
     }
     
-    ul {
+    .candidates {
         list-style-type: none;
     }
     
-    li {
+    .candidates li {
         display: inline-block;
     }
     
-    input[type="checkbox"][id^="cb"] {
+    .candidates li input[type="checkbox"][id^="cb"] {
         display: none;
     }
     
@@ -90,69 +89,91 @@
         box-shadow: 0 0 5px #333;
         z-index: -1;
     }
-</style>
-
-<body>
-    <h3>Choose your Candidate</h3>
+    </style>
+    <h3 class="text-center mb-3" id="vote-heading">Choose your Candidate</h3>
     <div id="cont">
         <center>
-            <ul>
-                <li><input type="checkbox" id="cb1" />
-                    <label for="cb1"><img src="{% static 'elections/img/default-pic.png' %}" />Tine, Celes</label>
+            <ul class="candidates">
+                <li>
+                    <input type="checkbox" id="cb1" />
+                    <label for="cb1">
+                        <img src="{% static "elections/img/default-pic.png" %}" alt="Sample" height="" width=""/>
+                        Tine, Celes
+                    </label>
                 </li>
-                <li><input type="checkbox" id="cb2" />
-                    <label for="cb2"><img src="{% static 'elections/img/default-pic.png' %}" />Cunana, Paul</label>
+                <li>
+                    <input type="checkbox" id="cb2" />
+                    <label for="cb2">
+                        <img src="{% static "elections/img/default-pic.png" %}" alt="Sample" height="" width=""/>
+                        Cunana, Paul
+                    </label>
                 </li>
-                <li><input type="checkbox" id="cb3" />
-                    <label for="cb3"><img src="{% static 'elections/img/default-pic.png' %}" />Juliana, Elizabeth</label>
+                <li>
+                    <input type="checkbox" id="cb3" />
+                    <label for="cb3">
+                        <img src="{% static "elections/img/default-pic.png" %}" alt="Sample" height="" width=""/>
+                        Juliana, Elizabeth
+                    </label>
                 </li>
-                <li><input type="checkbox" id="cb4" />
-                    <label for="cb4"><img src="{% static 'elections/img/default-pic.png' %}" />Dela Cruz, Juan</label>
+                <li>
+                    <input type="checkbox" id="cb4" />
+                    <label for="cb4">
+                        <img src="{% static "elections/img/default-pic.png" %}" alt="Sample" height="" width=""/>
+                        Dela Cruz, Juan
+                    </label>
                 </li>
             </ul>
         </center>
         <div class="container">
-
             <center>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="buttonConfirm">
-              Submit Vote
-            </button>
+                <button type="button"
+                        class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                        id="buttonConfirm">
+                    Submit Vote
+                </button>
             </center>
-
             <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade"
+                 id="exampleModal"
+                 tabindex="-1"
+                 aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            Are you sure about your vote?
+                            <p>You voted the following candidates. Please confirm your vote.</p>
+                            <h4>President</h4>
+                            <ul>
+                                <li>Sample Name</li>
+                            </ul>
+                            <h4>Vice President</h4>
+                            <ul>
+                                <li>Sample Name</li>
+                            </ul>
+                            <h4>Others</h4>
+                            <ul>
+                                <li>Sample Name</li>
+                                <li>Sample Name</li>
+                                <li>Sample Name</li>
+                                <li>Sample Name</li>
+                            </ul>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Confirm</button>
+                            <a href="{% static "elections/img/sample-ballot-receipt.jpg" %}" class="btn btn-primary">Confirm</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</body>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-{% endblock content %} >>>>>>> Stashed changes
+{% endblock content %}
