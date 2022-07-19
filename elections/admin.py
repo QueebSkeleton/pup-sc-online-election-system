@@ -1,3 +1,4 @@
+from calendar import c
 from django.contrib import admin
 
 from . import models
@@ -27,6 +28,24 @@ class CandidateAdmin(admin.ModelAdmin):
         return "%s %s" % (obj.first_name, obj.last_name)
 
 
+class OfferedPositionAdmin(admin.TabularInline):
+    model = models.OfferedPosition
+    extra = 0
+    min_num = 1
+
+
+class RunningCandidateAdmin(admin.TabularInline):
+    model = models.RunningCandidate
+    extra = 0
+    min_num = 1
+
+
 @admin.register(models.ElectionSeason)
 class ElectionSeasonAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on')
+
+    fieldsets = (('Primary Information', {'fields': ('academic_year', 'initiated_on',
+                                                     'concluded_on')}),
+                 (None, {'fields': ('tallied_results',)}),)
+
+    inlines = [OfferedPositionAdmin, RunningCandidateAdmin,]

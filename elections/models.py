@@ -10,6 +10,9 @@ class College(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class PoliticalParty(models.Model):
     """
@@ -18,7 +21,10 @@ class PoliticalParty(models.Model):
     """
     name = models.CharField(max_length=255)
     is_renewed = models.BooleanField()
-    current_officials = JSONField()
+    current_officials = JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class GovernmentPosition(models.Model):
@@ -28,7 +34,10 @@ class GovernmentPosition(models.Model):
     """
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    college = models.ForeignKey(to=College, on_delete=models.PROTECT)
+    college = models.ForeignKey(to=College, on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Candidate(models.Model):
@@ -38,11 +47,14 @@ class Candidate(models.Model):
     """
     student_number = models.CharField(max_length=15)
     college = models.ForeignKey(to=College, on_delete=models.PROTECT)
-    party = models.ForeignKey(to=PoliticalParty, on_delete=models.PROTECT)
+    party = models.ForeignKey(to=PoliticalParty, on_delete=models.PROTECT, null=True, blank=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     contact = models.CharField(max_length=255)
     image = models.ImageField()
+
+    def __str__(self):
+        return '%s - %s %s' % (self.student_number, self.first_name, self.last_name)
 
 
 class ElectionSeason(models.Model):
@@ -55,7 +67,7 @@ class ElectionSeason(models.Model):
                               choices=(('NEW', 'New'),
                                        ('ONGOING', 'Ongoing'),
                                        ('CONCLUDED', 'Concluded')))
-    tallied_results = JSONField()
+    tallied_results = JSONField(null=True, blank=True)
     offered_positions = models.ManyToManyField(to=GovernmentPosition,
                                                through='OfferedPosition')
     running_candidates = models.ManyToManyField(to=Candidate,
