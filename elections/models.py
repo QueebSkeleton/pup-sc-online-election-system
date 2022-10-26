@@ -26,6 +26,10 @@ class PoliticalParty(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Political Party'
+        verbose_name_plural = 'Political Parties'
+
 
 class GovernmentPosition(models.Model):
     """
@@ -38,6 +42,9 @@ class GovernmentPosition(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Government Position'
 
 
 class Candidate(models.Model):
@@ -74,6 +81,9 @@ class ElectionSeason(models.Model):
                                                 through='RunningCandidate')
     initiated_on = models.DateTimeField()
     concluded_on = models.DateTimeField()
+
+    class Meta:
+        verbose_name = 'Election Season'
 
 
 class OfferedPosition(models.Model):
