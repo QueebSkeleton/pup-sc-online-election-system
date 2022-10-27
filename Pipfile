@@ -9,6 +9,7 @@ pillow = "*"
 django-jsoneditor = "*"
 python-dotenv = "*"
 social-auth-app-django = "*"
+django-grappelli = "*"
 
 [dev-packages]
 autopep8 = "*"
