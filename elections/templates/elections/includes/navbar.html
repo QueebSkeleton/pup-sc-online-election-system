@@ -1,59 +1,55 @@
 {% load static %}
 <!-- Small Topbar -->
 <nav class="navbar navbar-dark bg-pup py-0" id="oes-topbar">
-    <div class="container">
-        {% if user.is_authenticated %}
-        <span class="navbar-text">
-            Logged in as {{ user.email }}
-        </span>
-        {% endif %}
-        <ul class="navbar-nav">
-            {% if user.is_authenticated %}
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url "logout" %}">Logout</a>
-            </li>
-            {% else %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'social:begin' 'azuread-oauth2' %}">Login to your Microsoft Account</a>
-            </li>
-            {% endif %}
-        </ul>
-    </div>
+  <div class="container">
+    {% if user.is_authenticated %}<span class="navbar-text">Logged in as {{ user.email }}</span>{% endif %}
+    <ul class="navbar-nav">
+      {% if user.is_authenticated %}
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url "logout" %}">Logout</a>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'social:begin' 'azuread-oauth2' %}">Login to your Microsoft Account</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
 </nav>
 <!-- Main Navbar -->
 <nav class="navbar navbar-expand-lg bg-light" id="oes-navbar">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'elections:index' %}">
-            <div class="d-flex justify-content-center">
-                <img src="{% static 'elections/img/pup-logo.png' %}"
-                     alt="PUP Logo"
-                     height="48"
-                     width=""
-                     class="mx-2"/>
-                <div class="brand-text">
-                    <p class="mb-0">Polytechnic University of the Philippines</p>
-                    <p class="fs-6 mb-0">Student Council Online Elections</p>
-                </div>
-            </div>
-        </a>
-        <button class="navbar-toggler"
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Vote</a>
-                </li>
-            </ul>
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'elections:index' %}">
+      <div class="d-flex justify-content-center">
+        <img src="{% static 'elections/img/pup-logo.png' %}"
+             alt="PUP Logo"
+             height="48"
+             width=""
+             class="mx-2"/>
+        <div class="brand-text">
+          <p class="mb-0">Polytechnic University of the Philippines</p>
+          <p class="fs-6 mb-0">Student Council Online Elections</p>
         </div>
+      </div>
+    </a>
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url "elections:index" %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url "elections:vote_step_first" %}">Vote</a>
+        </li>
+      </ul>
     </div>
+  </div>
 </nav>

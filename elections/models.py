@@ -14,23 +14,6 @@ class College(models.Model):
         return self.name
 
 
-class PoliticalParty(models.Model):
-    """
-    A political organization established by students pursuing a specific
-    ideology and agenda for the studentry.
-    """
-    name = models.CharField(max_length=255)
-    is_renewed = models.BooleanField()
-    current_officials = JSONField(null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Political Party'
-        verbose_name_plural = 'Political Parties'
-
-
 class GovernmentPosition(models.Model):
     """
     A position in the Student Council government. It is either a central
@@ -41,7 +24,7 @@ class GovernmentPosition(models.Model):
     college = models.ForeignKey(to=College, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.college.name + " - " if self.college else ""}{self.name}'
 
     class Meta:
         verbose_name = 'Government Position'
@@ -54,14 +37,14 @@ class Candidate(models.Model):
     """
     student_number = models.CharField(max_length=15)
     college = models.ForeignKey(to=College, on_delete=models.PROTECT)
-    party = models.ForeignKey(to=PoliticalParty, on_delete=models.PROTECT, null=True, blank=True)
+    party = models.CharField(max_length=255, null=True, blank=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     contact = models.CharField(max_length=255)
     image = models.ImageField()
 
     def __str__(self):
-        return '%s - %s %s' % (self.student_number, self.first_name, self.last_name)
+        return f'{self.student_number} - {self.first_name} {self.last_name}'
 
 
 class ElectionSeason(models.Model):
@@ -71,16 +54,14 @@ class ElectionSeason(models.Model):
     """
     academic_year = models.CharField(max_length=255)
     status = models.CharField(max_length=10,
-                              choices=(('NEW', 'New'),
-                                       ('ONGOING', 'Ongoing'),
+                              choices=(('INITIATED', 'Initiated'),
                                        ('CONCLUDED', 'Concluded')))
     tallied_results = JSONField(null=True, blank=True)
-    offered_positions = models.ManyToManyField(to=GovernmentPosition,
-                                               through='OfferedPosition')
-    running_candidates = models.ManyToManyField(to=Candidate,
-                                                through='RunningCandidate')
-    initiated_on = models.DateTimeField()
-    concluded_on = models.DateTimeField()
+    initiated_on = models.DateTimeField(null=True, blank=True)
+    concluded_on = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.academic_year
 
     class Meta:
         verbose_name = 'Election Season'
@@ -118,19 +99,12 @@ class RunningCandidate(models.Model):
 class Ballot(models.Model):
     """
     A voter's evidence of voting.
-    TODO: Should contain cryptographic signature.
     """
     election_season = models.ForeignKey(to=ElectionSeason,
                                         on_delete=models.PROTECT)
     voter = models.ForeignKey(to=auth_models.User,
                               on_delete=models.PROTECT)
+    voted_candidates = models.ManyToManyField(to=RunningCandidate)
     casted_on = models.DateTimeField()
-
-
-class VotedCandidate(models.Model):
-    """
-    A ballot's individual voted candidate.
-    """
-    ballot = models.ForeignKey(to=Ballot, on_delete=models.CASCADE)
-    running_candidate = models.ForeignKey(to=RunningCandidate,
-                                          on_delete=models.PROTECT)
+    signature = models.TextField(null=True, blank=True)
+    public_key = models.TextField(null=True, blank=True)

@@ -1,0 +1,108 @@
+{% extends "elections/base.html" %}
+{% load static %}
+
+{% block pagecss %}
+  <link rel="stylesheet" href="{% static "elections/css/vote_step_second.css" %}" />
+{% endblock pagecss %}
+
+{% block content %}
+  <h3 class="text-center mb-3" id="vote-heading">Choose your Candidate</h3>
+  <div id="cont">
+    <center>
+      <ul class="candidates">
+        <li>
+          <input type="radio" name="president" id="cb1" />
+          <label for="cb1">
+            <img src="{% static "elections/img/default-pic.png" %}"
+                 alt="Sample"
+                 height=""
+                 width=""/>
+            Tine, Celes
+          </label>
+        </li>
+        <li>
+          <input type="radio" name="president" id="cb2" />
+          <label for="cb2">
+            <img src="{% static "elections/img/default-pic.png" %}"
+                 alt="Sample"
+                 height=""
+                 width=""/>
+            Cunana, Paul
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="cb3" />
+          <label for="cb3">
+            <img src="{% static "elections/img/default-pic.png" %}"
+                 alt="Sample"
+                 height=""
+                 width=""/>
+            Juliana, Elizabeth
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="cb4" />
+          <label for="cb4">
+            <img src="{% static "elections/img/default-pic.png" %}"
+                 alt="Sample"
+                 height=""
+                 width=""/>
+            Dela Cruz, Juan
+          </label>
+        </li>
+      </ul>
+    </center>
+    <div class="container">
+      <center>
+        <button type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                id="buttonConfirm">
+          Submit Vote
+        </button>
+      </center>
+      <!-- Modal -->
+      <div class="modal fade"
+           id="exampleModal"
+           tabindex="-1"
+           aria-labelledby="exampleModalLabel"
+           aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+              <button type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>You voted the following candidates. Please confirm your vote.</p>
+              <h4>President</h4>
+              <ul>
+                <li>Sample Name</li>
+              </ul>
+              <h4>Vice President</h4>
+              <ul>
+                <li>Sample Name</li>
+              </ul>
+              <h4>Others</h4>
+              <ul>
+                <li>Sample Name</li>
+                <li>Sample Name</li>
+                <li>Sample Name</li>
+                <li>Sample Name</li>
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <a href="{% static "elections/img/sample-ballot-receipt.jpg" %}"
+                 class="btn btn-primary">Confirm</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

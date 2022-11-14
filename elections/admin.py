@@ -1,26 +1,25 @@
-from calendar import c
 from django.contrib import admin
+from django.utils.html import mark_safe
 
 from . import models
 
 
 @admin.register(models.College)
-class CollegeAdmin(admin.ModelAdmin):
+class CollegeModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
-@admin.register(models.PoliticalParty)
-class PoliticalPartyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_renewed',)
-
-
 @admin.register(models.GovernmentPosition)
-class GovernmentPositionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description',)
+class GovernmentPositionModelAdmin(admin.ModelAdmin):
+    list_display = ('name', 'college_description', 'description',)
+
+    @admin.display
+    def college_description(self, obj):
+        return obj.college if obj.college else '- CENTRAL -'
 
 
 @admin.register(models.Candidate)
-class CandidateAdmin(admin.ModelAdmin):
+class CandidateModelAdmin(admin.ModelAdmin):
     list_display = ('student_number', 'college', 'party', 'name',)
 
     @admin.display
@@ -28,24 +27,39 @@ class CandidateAdmin(admin.ModelAdmin):
         return "%s %s" % (obj.first_name, obj.last_name)
 
 
-class OfferedPositionAdmin(admin.TabularInline):
+class OfferedPositionTabularInline(admin.TabularInline):
     model = models.OfferedPosition
     extra = 0
     min_num = 1
 
 
-class RunningCandidateAdmin(admin.TabularInline):
+class RunningCandidateTabularInline(admin.TabularInline):
     model = models.RunningCandidate
     extra = 0
     min_num = 1
 
 
 @admin.register(models.ElectionSeason)
-class ElectionSeasonAdmin(admin.ModelAdmin):
-    list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on')
+class ElectionSeasonModelAdmin(admin.ModelAdmin):
+    list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on', 'manage', 'override',)
 
-    fieldsets = (('Primary Information', {'fields': ('academic_year', 'initiated_on',
-                                                     'concluded_on')}),
-                 (None, {'fields': ('tallied_results',)}),)
+    fields = ('academic_year',)
+    inlines = [OfferedPositionTabularInline, RunningCandidateTabularInline,]
 
-    inlines = [OfferedPositionAdmin, RunningCandidateAdmin,]
+    # TODO: Add views for initiating, concluding, and overriding
+
+    @admin.display()
+    def manage(self, obj):
+        if not obj.status:
+            return mark_safe(f'<a href="{obj.id}/initiate/">Initiate</a>')
+        elif obj.status == "INITIATED":
+            return mark_safe(f'<a href="{obj.id}/conclude/">Conclude</a>')
+        else:
+            return "N/A"
+
+    @admin.display()
+    def override(self, obj):
+        if obj.status == "CONCLUDED":
+            return mark_safe(f'<a href="{obj.id}/override/">Override</a>')
+        else:
+            return "N/A"

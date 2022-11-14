@@ -1,54 +1,44 @@
 {% extends "elections/base.html" %}
 {% load static %}
 {% block content %}
-<!-- Banner -->
-<section class="mb-4">
-    <img src="{% static "elections/img/banner.jpg" %}" alt="PUP Banner" width="" height="" class="img-fluid"/>
-</section>
-<!-- Information Section -->
-<section class="container mb-4">
-    <h1 class="mb-3">PUPians, cast your votes!</h1>
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card shadow h-100">
-                <div class="card-body">
-                    <h4>How do I vote?</h4>
-                    <p class="text-success">PUPSC Elections AY2021-2022 | ONGOING</p>
-                    <hr/>
-                    <h5>Online Procedure</h5>
-                    <ol>
-                        <li>Login to <a href="{% url 'social:begin' 'azuread-oauth2' %}" class="text-decoration-none">your account</a> to vote.</li>
-                        <li>Select your preferred candidates.</li>
-                        <li>Click "Finalize" and confirm your votes.</li>
-                        <li>Download your PDF receipt.</li>
-                    </ol>
-                    <h5>I don't trust this app</h5>
-                    <ol>
-                        <li>Head to the designated room on your building.</li>
-                        <li>Fill out your ballot.</li>
-                        <li>Provide your ballot to the COMELEC personnel in charge.</li>
-                        <li>Wait for your receipt.</li>
-                    </ol>
-                </div>
-            </div>
+  <!-- Banner -->
+  <section class="mb-4">
+    <img src="{% static "elections/img/banner.jpg" %}"
+         alt="PUP Banner"
+         width=""
+         height=""
+         class="img-fluid"/>
+  </section>
+  <!-- Information Section -->
+  <section class="container mb-4">
+    <h1 class="text-center mb-3">PUPians, cast your votes!</h1>
+    <div class="row justify-content-center">
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-body">
+            <h4>How do I vote?</h4>
+            <p class="text-success">PUPSC Elections AY2021-2022 | ONGOING</p>
+            <hr/>
+            <h5>Online Procedure</h5>
+            <ol>
+              <li>
+                Login to <a href="{% url 'social:begin' 'azuread-oauth2' %}"
+    class="text-decoration-none">your account</a> to vote.
+              </li>
+              <li>Select your preferred candidates.</li>
+              <li>Click "Finalize" and confirm your votes.</li>
+              <li>Download your PDF receipt.</li>
+            </ol>
+            <h5>I don't trust this app</h5>
+            <ol>
+              <li>Head to the designated room on your building.</li>
+              <li>Fill out your ballot.</li>
+              <li>Provide your ballot to the COMELEC personnel in charge.</li>
+              <li>Wait for your receipt.</li>
+            </ol>
+          </div>
         </div>
-        <div class="col-md-8">
-            <div class="card shadow h-100">
-                <div class="card-body">
-                    <h4>Announcements</h4>
-                    <ul>
-                        <li><b>July 24, 2022</b> Filing of Certificate of Candidacy for students is now open.</li>
-                        <li><b>Nnnn nn, nnnn</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                        <li><b>Nnnn nn, nnnn</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                        <li><b>Nnnn nn, nnnn</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                        <li><b>Nnnn nn, nnnn</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                        <li><b>Nnnn nn, nnnn</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                        <li><b>Nnnn nn, nnnn</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                        <li><b>Nnnn nn, nnnn</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
+  </section>
 {% endblock content %}

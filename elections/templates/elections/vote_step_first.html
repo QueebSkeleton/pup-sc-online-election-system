@@ -1,0 +1,23 @@
+{% extends "elections/base.html" %}
+{% load widget_tweaks %}
+{# Content #}
+{% block content %}
+  <div class="container py-5">
+    <h1 class="h3 text-center mb-4">Specify your College</h1>
+
+    <div class="row justify-content-center mb-4">
+      <div class="col-sm-6 col-md-8">
+        <form method="post" action="{% url "elections:vote_step_first" %}">
+          {% csrf_token %}
+    
+          <div class="mb-3">
+            {% render_field college_choice_form.college_of_voter class="form-control" %}
+          </div>
+
+          <button type="submit" class="btn btn-primary">Proceed</button>
+        </form>
+      </div>
+    </div>
+    
+  </div>
+{% endblock content %}

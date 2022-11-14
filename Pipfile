@@ -10,6 +10,7 @@ django-jsoneditor = "*"
 python-dotenv = "*"
 social-auth-app-django = "*"
 django-grappelli = "*"
+django-widget-tweaks = "*"
 
 [dev-packages]
 autopep8 = "*"
