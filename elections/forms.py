@@ -1,36 +1,65 @@
 from django import forms
+from django.utils.html import mark_safe
 
 from .models import College
 
 
 class VoteCollegeChoiceForm(forms.Form):
+    """
+    Form for a voter to choose which college he/she came from.
+    """
     college_of_voter = forms.ModelChoiceField(queryset=College.objects.all())
 
 
+class CandidateMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return mark_safe(
+            "<img src='"
+            + (obj.candidate.image.url if obj.candidate.image
+                else 'https://via.placeholder.com/150')
+            + "' class='img-fluid' />"
+            + "<p class='text-center'>"
+            + obj.candidate.first_name + " "
+            + obj.candidate.last_name
+            + "</p>")
+
+
 class VotingForm(forms.Form):
+    """
+    Form used by a voter to pick candidates.
+    Has dynamic multiple choice fields (checkbox)
+    for each of an election season's offered positions.
+    """
+
     def __init__(self, *args, **kwargs):
-        # Get election season from here
         election_season = kwargs.pop('election_season')
-        college = kwargs.pop('college')
+        voter_college = kwargs.pop('college')
 
         super().__init__(*args, **kwargs)
 
-        # Filter the election season's running candidates
-        # based on the voter's college,
-        # then create choice fields for each position
-        running_candidates = {}
-        for running_candidate in election_season.runningcandidate_set:
-            if running_candidate.government_position.id not in running_candidates:
-                running_candidates[running_candidate.government_position.id] \
-                    = []
-            
-            # Insert to running candidates if it runs on CENTRAL (null value)
-            # or on the same college as the voter
-            if running_candidate.government_position.college == college:
-                running_candidates[running_candidate.government_position.id] \
-                    .append(running_candidate)
+        # For each position offered in this election season,
+        # create a multiple choice field  with the candidates as the choices.
+        for offered_position in election_season.offeredposition_set.all():
 
-        # TODO: Create the form fields per position
+            position_college = offered_position.government_position.college
 
-    def clean(self):
-        pass
+            # Only create a field for positions that belong
+            # either in CENTRAL SC or in the same college SC as the voter.
+            if position_college == None or position_college == voter_college:
+                field_name \
+                    = ((position_college.name.replace(' ', '').lower()
+                        if position_college else 'central')) \
+                    + "_" + (offered_position.government_position.name
+                             .replace(' ', '').lower())
+
+                field_label \
+                    = ((position_college.name if position_college else 'Central')) \
+                    + " - " + offered_position.government_position.name
+
+                self.fields[field_name] = CandidateMultipleChoiceField(
+                    queryset=election_season
+                    .runningcandidate_set
+                    .filter(government_position=offered_position
+                            .government_position))
+
+                self.fields[field_name].label = field_label

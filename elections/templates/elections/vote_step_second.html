@@ -1,108 +1,119 @@
 {% extends "elections/base.html" %}
 {% load static %}
-
 {% block pagecss %}
-  <link rel="stylesheet" href="{% static "elections/css/vote_step_second.css" %}" />
+  <link rel="stylesheet"
+        href="{% static "elections/css/vote_step_second.css" %}"/>
 {% endblock pagecss %}
-
 {% block content %}
-  <h3 class="text-center mb-3" id="vote-heading">Choose your Candidate</h3>
-  <div id="cont">
-    <center>
-      <ul class="candidates">
-        <li>
-          <input type="radio" name="president" id="cb1" />
-          <label for="cb1">
-            <img src="{% static "elections/img/default-pic.png" %}"
-                 alt="Sample"
-                 height=""
-                 width=""/>
-            Tine, Celes
-          </label>
-        </li>
-        <li>
-          <input type="radio" name="president" id="cb2" />
-          <label for="cb2">
-            <img src="{% static "elections/img/default-pic.png" %}"
-                 alt="Sample"
-                 height=""
-                 width=""/>
-            Cunana, Paul
-          </label>
-        </li>
-        <li>
-          <input type="checkbox" id="cb3" />
-          <label for="cb3">
-            <img src="{% static "elections/img/default-pic.png" %}"
-                 alt="Sample"
-                 height=""
-                 width=""/>
-            Juliana, Elizabeth
-          </label>
-        </li>
-        <li>
-          <input type="checkbox" id="cb4" />
-          <label for="cb4">
-            <img src="{% static "elections/img/default-pic.png" %}"
-                 alt="Sample"
-                 height=""
-                 width=""/>
-            Dela Cruz, Juan
-          </label>
-        </li>
-      </ul>
-    </center>
-    <div class="container">
-      <center>
-        <button type="button"
-                class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
-                id="buttonConfirm">
-          Submit Vote
-        </button>
-      </center>
-      <!-- Modal -->
-      <div class="modal fade"
-           id="exampleModal"
-           tabindex="-1"
-           aria-labelledby="exampleModalLabel"
-           aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
-              <button type="button"
-                      class="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <p>You voted the following candidates. Please confirm your vote.</p>
-              <h4>President</h4>
-              <ul>
-                <li>Sample Name</li>
-              </ul>
-              <h4>Vice President</h4>
-              <ul>
-                <li>Sample Name</li>
-              </ul>
-              <h4>Others</h4>
-              <ul>
-                <li>Sample Name</li>
-                <li>Sample Name</li>
-                <li>Sample Name</li>
-                <li>Sample Name</li>
-              </ul>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <a href="{% static "elections/img/sample-ballot-receipt.jpg" %}"
-                 class="btn btn-primary">Confirm</a>
+  <div class="container py-5">
+    <h1 class="text-center">Vote for your preferred candidates.</h1>
+    <p class="text-center">
+      For each position, click on a candidate to choose it.
+      You may abstain by leaving that position blank.
+    </p>
+    <form method="post" id="voterBallotForm">
+      {% csrf_token %}
+      {% for position in voting_form %}
+        {% if position.field.queryset.count %}
+          <div class="border-top pt-3 mb-3">
+            <h2 class="text-center h4">{{ position.label }}</h2>
+            <div class="row g-3 justify-content-center mb-3">
+              {# TODO: Find a way to output the widget with Django, not manually. #}
+              {% for value, label in position.field.choices %}
+                <div class="col-4 col-sm-2 candidate-choice">
+                  <div class="text-center">
+                    <input type="checkbox"
+                           name="{{ position.html_name }}"
+                           value="{{ value }}"
+                           id="{{ position.html_name }}_{{ value }}"/>
+                  </div>
+                  <label for="{{ position.html_name }}_{{ value }}">{{ label }}</label>
+                </div>
+              {% endfor %}
             </div>
           </div>
+        {% endif %}
+      {% endfor %}
+      <div class="text-center">
+        <button type="button"
+                class="btn btn-primary"
+                id="confirmButton"
+                data-bs-toggle="modal"
+                data-bs-target="#confirmModal">
+          Confirm Vote
+        </button>
+      </div>
+    </form>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade"
+       id="confirmModal"
+       tabindex="-1"
+       aria-labelledby="#confirmModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmModalLabel">
+            <i class="fa-solid fa-receipt"></i>
+            Confirm your Votes
+          </h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <a href="{% static "elections/img/sample-ballot-receipt.jpg" %}"
+             class="btn btn-primary">Confirm</a>
         </div>
       </div>
     </div>
   </div>
 {% endblock content %}
+{% block pagescript %}
+  <script>
+      const confirmButton = document.getElementById("confirmButton");
+      confirmButton.addEventListener("click", () => {
+        const ballotFormData = new FormData(
+          document.getElementById("voterBallotForm"));
+        ballotFormData.delete("csrfmiddlewaretoken");
+        const votedCandidatesIds = Array.from(ballotFormData.values());
+
+        let idParams = votedCandidatesIds.reduce(
+          (paramsStr, id) => paramsStr + "&ids=" + id, "")
+          .substring(1);
+
+        const confirmationRequest = new XMLHttpRequest();
+        confirmationRequest.onload = () => {
+          const responseObject = JSON.parse(confirmationRequest.response);
+
+          const confirmModalBody =
+            document.getElementById('confirmModal')
+              .getElementsByClassName('modal-body')[0];
+          confirmModalBody.replaceChildren();
+
+          for(const [position, votedCandidates] of Object.entries(responseObject)) {
+            const positionHeader = document.createElement("h4");
+            positionHeader.appendChild(document.createTextNode(position));
+
+            const votedCandidatesList = document.createElement("ul");
+            for(const candidate of votedCandidates) {
+              const candidateListElem = document.createElement("li");
+              candidateListElem.appendChild(document.createTextNode(candidate));
+              votedCandidatesList.appendChild(candidateListElem);
+            }
+
+            confirmModalBody.appendChild(positionHeader);
+            confirmModalBody.appendChild(votedCandidatesList);
+          }
+        };
+        confirmationRequest.open('GET',
+          '{% url "elections:confirm_selected_candidates" %}?' + idParams);
+        confirmationRequest.send();
+      });
+  </script>
+{% endblock pagescript %}

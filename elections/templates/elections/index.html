@@ -16,26 +16,38 @@
       <div class="col-md-4">
         <div class="card shadow h-100">
           <div class="card-body">
-            <h4>How do I vote?</h4>
-            <p class="text-success">PUPSC Elections AY2021-2022 | ONGOING</p>
-            <hr/>
-            <h5>Online Procedure</h5>
-            <ol>
-              <li>
-                Login to <a href="{% url 'social:begin' 'azuread-oauth2' %}"
-    class="text-decoration-none">your account</a> to vote.
-              </li>
-              <li>Select your preferred candidates.</li>
-              <li>Click "Finalize" and confirm your votes.</li>
-              <li>Download your PDF receipt.</li>
-            </ol>
-            <h5>I don't trust this app</h5>
-            <ol>
-              <li>Head to the designated room on your building.</li>
-              <li>Fill out your ballot.</li>
-              <li>Provide your ballot to the COMELEC personnel in charge.</li>
-              <li>Wait for your receipt.</li>
-            </ol>
+            {% if current_election_season %}
+              <h2 class="h3">How do I vote?</h2>
+              <p class="text-success">
+                PUPSC Elections
+                {{ current_election_season }} |
+                {{ current_election_season.status }}
+              </p>
+              <a href="{% url "elections:vote_step_first" %}"
+                class="btn btn-sm btn-primary">Vote</a>
+              <hr/>
+              <h3 class="h4">Online Procedure</h3>
+              <ol>
+                {# TODO: Don't show login button when logged in. #}
+                <li>
+                  Login to your <b>Microsoft Webmail account</b> using
+                  the link on the heading of this page.
+                </li>
+                <li>Select your preferred candidates.</li>
+                <li>Click "Finalize" and confirm your votes.</li>
+                <li>Download your PDF receipt.</li>
+              </ol>
+              <h3 class="h4">I don't trust this app</h3>
+              <p>
+                Head to the designated room for your college
+                and vote there.
+              </p>
+            {% else %}
+              <h2 class="h3">How do I vote?</h2>
+              <p class="text-danger">
+                There is no ongoing election.
+              </p>
+            {% endif %}
           </div>
         </div>
       </div>
