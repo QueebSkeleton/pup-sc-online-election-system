@@ -53,8 +53,9 @@ class ElectionSeason(models.Model):
     to host multiple elections by handling its states and details.
     """
     academic_year = models.CharField(max_length=255)
-    status = models.CharField(max_length=10,
+    status = models.CharField(null=True, blank=True, max_length=10,
                               choices=(('INITIATED', 'Initiated'),
+                                       ('CONCLUDING', 'Concluding'),
                                        ('CONCLUDED', 'Concluded')))
     tallied_results = JSONField(null=True, blank=True)
     initiated_on = models.DateTimeField(null=True, blank=True)
@@ -73,7 +74,7 @@ class OfferedPosition(models.Model):
     many of such position needs to be elected.
     """
     election_season = models.ForeignKey(to=ElectionSeason,
-                                        on_delete=models.PROTECT)
+                                        on_delete=models.CASCADE)
     government_position = models.ForeignKey(to=GovernmentPosition,
                                             on_delete=models.PROTECT)
     max_positions_to_fill = models.PositiveSmallIntegerField()
@@ -86,7 +87,7 @@ class RunningCandidate(models.Model):
     inputted.
     """
     election_season = models.ForeignKey(to=ElectionSeason,
-                                        on_delete=models.PROTECT)
+                                        on_delete=models.CASCADE)
     candidate = models.ForeignKey(to=Candidate,
                                   on_delete=models.PROTECT)
     government_position = models.ForeignKey(to=GovernmentPosition,

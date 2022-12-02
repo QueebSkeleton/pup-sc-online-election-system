@@ -1,0 +1,19 @@
+{% extends "elections/base.html" %}
+
+{% block content %}
+  <div class="container py-5">
+    <h1 class="h3 text-center mb-4">Your vote has been submitted.</h1>
+    <div class="text-center mb-3">
+      <a href="#"
+        class="btn btn-sm btn-primary">
+        <i class="fa-solid fa-pdf"></i>
+        Get PDF Receipt
+      </a>
+      <a href="{% url "elections:index" %}"
+        class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-reply"></i>
+        Back to Homepage
+      </a>
+    </div>
+  </div>
+{% endblock content %}

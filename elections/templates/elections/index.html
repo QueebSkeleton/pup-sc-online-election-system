@@ -11,6 +11,18 @@
   </section>
   <!-- Information Section -->
   <section class="container mb-4">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+             role="alert">
+          {{ message }}
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
     <h1 class="text-center mb-3">PUPians, cast your votes!</h1>
     <div class="row justify-content-center">
       <div class="col-md-4">
@@ -23,8 +35,12 @@
                 {{ current_election_season }} |
                 {{ current_election_season.status }}
               </p>
-              <a href="{% url "elections:vote_step_first" %}"
-                class="btn btn-sm btn-primary">Vote</a>
+              {% if not has_already_voted %}
+                <a href="{% url "elections:vote_step_first" %}"
+                   class="btn btn-sm btn-primary">Vote</a>
+              {% else %}
+                <p class="text-primary">You have already voted for this election.</p>
+              {% endif %}
               <hr/>
               <h3 class="h4">Online Procedure</h3>
               <ol>
@@ -44,9 +60,7 @@
               </p>
             {% else %}
               <h2 class="h3">How do I vote?</h2>
-              <p class="text-danger">
-                There is no ongoing election.
-              </p>
+              <p class="text-danger">There is no ongoing election.</p>
             {% endif %}
           </div>
         </div>

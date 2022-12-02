@@ -67,8 +67,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <a href="{% static "elections/img/sample-ballot-receipt.jpg" %}"
-             class="btn btn-primary">Confirm</a>
+          <button class="btn btn-primary" id="finalizeBallotButton">Finalize</button>
         </div>
       </div>
     </div>
@@ -114,6 +113,12 @@
         confirmationRequest.open('GET',
           '{% url "elections:confirm_selected_candidates" %}?' + idParams);
         confirmationRequest.send();
+      });
+
+
+      const finalizeBallotButton = document.getElementById('finalizeBallotButton');
+      finalizeBallotButton.addEventListener("click", () => {
+        document.getElementById("voterBallotForm").requestSubmit();
       });
   </script>
 {% endblock pagescript %}

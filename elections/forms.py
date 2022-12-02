@@ -19,7 +19,8 @@ class CandidateMultipleChoiceField(forms.ModelMultipleChoiceField):
                 else 'https://via.placeholder.com/150')
             + "' class='img-fluid' />"
             + "<p class='text-center'>"
-            + obj.candidate.first_name + " "
+            + f"#{obj.ballot_number} - "
+            + f"{obj.candidate.first_name} "
             + obj.candidate.last_name
             + "</p>")
 
@@ -44,22 +45,27 @@ class VotingForm(forms.Form):
             position_college = offered_position.government_position.college
 
             # Only create a field for positions that belong
-            # either in CENTRAL SC or in the same college SC as the voter.
+            # either in CENTRAL SC or in the same college SC as the voter,
+            # and if there are actual running candidates in that position.
             if position_college == None or position_college == voter_college:
-                field_name \
-                    = ((position_college.name.replace(' ', '').lower()
-                        if position_college else 'central')) \
-                    + "_" + (offered_position.government_position.name
-                             .replace(' ', '').lower())
+                candidates_queryset \
+                    = (election_season.runningcandidate_set
+                       .filter(government_position=offered_position
+                               .government_position))
 
-                field_label \
-                    = ((position_college.name if position_college else 'Central')) \
-                    + " - " + offered_position.government_position.name
+                if candidates_queryset.count() > 0:
+                    field_name \
+                        = ((position_college.name.replace(' ', '').lower()
+                            if position_college else 'central')) \
+                        + "_" + (offered_position.government_position.name
+                                .replace(' ', '').lower())
 
-                self.fields[field_name] = CandidateMultipleChoiceField(
-                    queryset=election_season
-                    .runningcandidate_set
-                    .filter(government_position=offered_position
-                            .government_position))
+                    field_label \
+                        = ((position_college.name
+                            if position_college else 'Central')) \
+                        + " - " + offered_position.government_position.name
 
-                self.fields[field_name].label = field_label
+                    self.fields[field_name] = CandidateMultipleChoiceField(
+                        queryset=candidates_queryset)
+
+                    self.fields[field_name].label = field_label
