@@ -3,6 +3,7 @@ from django.contrib.auth import models as auth_models
 
 from jsoneditor.fields.django3_jsonfield import JSONField
 
+
 class College(models.Model):
     """
     A College situated in the Polytechnic University of the Philippines.
@@ -21,7 +22,8 @@ class GovernmentPosition(models.Model):
     """
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    college = models.ForeignKey(to=College, on_delete=models.PROTECT, null=True, blank=True)
+    college = models.ForeignKey(
+        to=College, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return f'{self.college.name + " - " if self.college else ""}{self.name}'
@@ -57,7 +59,6 @@ class ElectionSeason(models.Model):
                               choices=(('INITIATED', 'Initiated'),
                                        ('CONCLUDING', 'Concluding'),
                                        ('CONCLUDED', 'Concluded')))
-    tallied_results = JSONField(null=True, blank=True)
     initiated_on = models.DateTimeField(null=True, blank=True)
     concluded_on = models.DateTimeField(null=True, blank=True)
 
@@ -95,6 +96,7 @@ class RunningCandidate(models.Model):
     ballot_number = models.PositiveSmallIntegerField()
     is_disqualified = models.BooleanField()
     disqualification_reason = models.TextField(null=True, blank=True)
+    tallied_votes = models.PositiveIntegerField(null=True, blank=True)
 
 
 class Ballot(models.Model):
@@ -109,3 +111,18 @@ class Ballot(models.Model):
     casted_on = models.DateTimeField()
     signature = models.TextField(null=True, blank=True)
     public_key = models.TextField(null=True, blank=True)
+
+
+class ElectionSeasonWinningCandidate(models.Model):
+    """
+    A result model (summary table) that resembles a winning candidate
+    in an election season for a position.
+    """
+    election_season = models.ForeignKey(null=True, to=ElectionSeason,
+                                        on_delete=models.SET_NULL)
+    running_candidate = models.ForeignKey(null=True, to='RunningCandidate',
+                                          on_delete=models.SET_NULL)
+    # Duplicated fields for the sake of summary tables
+    position_name = models.CharField(max_length=510)
+    ballot_number = models.PositiveSmallIntegerField()
+    candidate_name = models.CharField(max_length=510)
