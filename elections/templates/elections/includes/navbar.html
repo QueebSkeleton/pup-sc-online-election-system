@@ -1,6 +1,7 @@
 {% load static %}
+
 <!-- Small Topbar -->
-<nav class="navbar navbar-dark bg-pup py-0" id="oes-topbar">
+<!-- <nav class="navbar navbar-dark bg-pup py-0" id="oes-topbar">
   <div class="container">
     {% if user.is_authenticated %}<span class="navbar-text">Logged in as {{ user.email }}</span>{% endif %}
     <ul class="navbar-nav">
@@ -15,10 +16,9 @@
       {% endif %}
     </ul>
   </div>
-</nav>
+</nav> -->
 <!-- Main Navbar -->
-<nav class="navbar navbar-expand-lg bg-light" id="oes-navbar">
-  <div class="container">
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-pup" id="oes-navbar">
     <a class="navbar-brand" href="{% url 'elections:index' %}">
       <div class="d-flex justify-content-center">
         <img src="{% static 'elections/img/pup-logo.png' %}"
@@ -42,7 +42,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
           <a class="nav-link" href="{% url "elections:index" %}">Home</a>
         </li>
@@ -50,6 +50,19 @@
           <a class="nav-link" href="{% url "elections:vote_step_first" %}">Vote</a>
         </li>
       </ul>
+      <!-- TO DO: Put this shit on the right while still inside of the collapse-->
+      {% if user.is_authenticated %}<span class="navbar-text ml-auto">Logged in as {{ user.email }}</span>{% endif %}
+      <ul class="navbar-nav ml-auto">
+        {% if user.is_authenticated %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url "logout" %}">Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'social:begin' 'azuread-oauth2' %}">Login to your Microsoft Account</a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
-  </div>
+
 </nav>
