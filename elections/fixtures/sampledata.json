@@ -1,0 +1,457 @@
+[
+{
+    "model": "elections.college",
+    "pk": 1,
+    "fields": {
+        "name": "CCIS",
+        "description": ""
+    }
+},
+{
+    "model": "elections.college",
+    "pk": 2,
+    "fields": {
+        "name": "CSSD",
+        "description": ""
+    }
+},
+{
+    "model": "elections.governmentposition",
+    "pk": 1,
+    "fields": {
+        "name": "President",
+        "description": "",
+        "college": null
+    }
+},
+{
+    "model": "elections.governmentposition",
+    "pk": 2,
+    "fields": {
+        "name": "Vice President",
+        "description": "",
+        "college": null
+    }
+},
+{
+    "model": "elections.governmentposition",
+    "pk": 3,
+    "fields": {
+        "name": "Councilor",
+        "description": "",
+        "college": null
+    }
+},
+{
+    "model": "elections.governmentposition",
+    "pk": 4,
+    "fields": {
+        "name": "President",
+        "description": "",
+        "college": 1
+    }
+},
+{
+    "model": "elections.governmentposition",
+    "pk": 5,
+    "fields": {
+        "name": "Vice President",
+        "description": "",
+        "college": 1
+    }
+},
+{
+    "model": "elections.governmentposition",
+    "pk": 6,
+    "fields": {
+        "name": "President",
+        "description": "",
+        "college": 2
+    }
+},
+{
+    "model": "elections.governmentposition",
+    "pk": 7,
+    "fields": {
+        "name": "Vice President",
+        "description": "",
+        "college": 2
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 1,
+    "fields": {
+        "student_number": "2019-00001-MN-0",
+        "college": 1,
+        "party": null,
+        "first_name": "Cian",
+        "last_name": "Fry",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_goSiYx6.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 2,
+    "fields": {
+        "student_number": "2019-00002-MN-0",
+        "college": 1,
+        "party": null,
+        "first_name": "Charley",
+        "last_name": "Wilkerson",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_kBXqTJV.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 3,
+    "fields": {
+        "student_number": "2019-00003-MN-0",
+        "college": 1,
+        "party": null,
+        "first_name": "Astrid",
+        "last_name": "Huff",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_zqk9mlA.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 4,
+    "fields": {
+        "student_number": "2019-00004-MN-0",
+        "college": 1,
+        "party": null,
+        "first_name": "Aqsa",
+        "last_name": "Frederick",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_pnVu0SB.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 5,
+    "fields": {
+        "student_number": "2019-00005-MN-0",
+        "college": 2,
+        "party": null,
+        "first_name": "Earl",
+        "last_name": "Dickson",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_HiE2FDE.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 6,
+    "fields": {
+        "student_number": "2019-00006-MN-0",
+        "college": 2,
+        "party": null,
+        "first_name": "Antony",
+        "last_name": "Best",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_jNhrJH5.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 7,
+    "fields": {
+        "student_number": "2019-00007-MN-0",
+        "college": 2,
+        "party": null,
+        "first_name": "Fraser",
+        "last_name": "Holman",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_srzgdMI.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 8,
+    "fields": {
+        "student_number": "2019-00008-MN-0",
+        "college": 2,
+        "party": null,
+        "first_name": "Yusuf",
+        "last_name": "Tomas",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_yrXMCvp.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 9,
+    "fields": {
+        "student_number": "2019-00009-MN-0",
+        "college": 1,
+        "party": null,
+        "first_name": "Zaina",
+        "last_name": "Bolton",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_gxhDYwQ.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 10,
+    "fields": {
+        "student_number": "2019-00010-MN-0",
+        "college": 1,
+        "party": null,
+        "first_name": "Wojciech",
+        "last_name": "Nunez",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_iu7t3XW.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 11,
+    "fields": {
+        "student_number": "2019-00011-MN-0",
+        "college": 2,
+        "party": null,
+        "first_name": "Ana",
+        "last_name": "Byrd",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_rEAaSaU.png"
+    }
+},
+{
+    "model": "elections.candidate",
+    "pk": 12,
+    "fields": {
+        "student_number": "2019-00012-MN-0",
+        "college": 2,
+        "party": null,
+        "first_name": "Gavin",
+        "last_name": "Stafford",
+        "contact": "+639123456789",
+        "image": "30-307416_profile-icon-png-image-free-download-searchpng-employee_uUrNEE6.png"
+    }
+},
+{
+    "model": "elections.electionseason",
+    "pk": 1,
+    "fields": {
+        "academic_year": "AY2022-2023",
+        "status": null,
+        "initiated_on": null,
+        "concluded_on": null
+    }
+},
+{
+    "model": "elections.offeredposition",
+    "pk": 1,
+    "fields": {
+        "election_season": 1,
+        "government_position": 1,
+        "max_positions_to_fill": 1
+    }
+},
+{
+    "model": "elections.offeredposition",
+    "pk": 2,
+    "fields": {
+        "election_season": 1,
+        "government_position": 2,
+        "max_positions_to_fill": 1
+    }
+},
+{
+    "model": "elections.offeredposition",
+    "pk": 3,
+    "fields": {
+        "election_season": 1,
+        "government_position": 4,
+        "max_positions_to_fill": 1
+    }
+},
+{
+    "model": "elections.offeredposition",
+    "pk": 4,
+    "fields": {
+        "election_season": 1,
+        "government_position": 5,
+        "max_positions_to_fill": 1
+    }
+},
+{
+    "model": "elections.offeredposition",
+    "pk": 5,
+    "fields": {
+        "election_season": 1,
+        "government_position": 6,
+        "max_positions_to_fill": 1
+    }
+},
+{
+    "model": "elections.offeredposition",
+    "pk": 6,
+    "fields": {
+        "election_season": 1,
+        "government_position": 7,
+        "max_positions_to_fill": 1
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 1,
+    "fields": {
+        "election_season": 1,
+        "candidate": 1,
+        "government_position": 4,
+        "ballot_number": 1,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 2,
+    "fields": {
+        "election_season": 1,
+        "candidate": 2,
+        "government_position": 4,
+        "ballot_number": 2,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 3,
+    "fields": {
+        "election_season": 1,
+        "candidate": 3,
+        "government_position": 5,
+        "ballot_number": 1,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 4,
+    "fields": {
+        "election_season": 1,
+        "candidate": 4,
+        "government_position": 5,
+        "ballot_number": 2,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 5,
+    "fields": {
+        "election_season": 1,
+        "candidate": 5,
+        "government_position": 6,
+        "ballot_number": 1,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 6,
+    "fields": {
+        "election_season": 1,
+        "candidate": 6,
+        "government_position": 6,
+        "ballot_number": 2,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 7,
+    "fields": {
+        "election_season": 1,
+        "candidate": 7,
+        "government_position": 7,
+        "ballot_number": 1,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 8,
+    "fields": {
+        "election_season": 1,
+        "candidate": 8,
+        "government_position": 7,
+        "ballot_number": 2,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 9,
+    "fields": {
+        "election_season": 1,
+        "candidate": 9,
+        "government_position": 1,
+        "ballot_number": 1,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 10,
+    "fields": {
+        "election_season": 1,
+        "candidate": 10,
+        "government_position": 1,
+        "ballot_number": 2,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 11,
+    "fields": {
+        "election_season": 1,
+        "candidate": 11,
+        "government_position": 2,
+        "ballot_number": 1,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+},
+{
+    "model": "elections.runningcandidate",
+    "pk": 12,
+    "fields": {
+        "election_season": 1,
+        "candidate": 12,
+        "government_position": 2,
+        "ballot_number": 2,
+        "is_disqualified": false,
+        "disqualification_reason": "",
+        "tallied_votes": null
+    }
+}
+]
