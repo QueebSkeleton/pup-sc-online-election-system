@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib import messages
 
@@ -20,7 +19,7 @@ def index(request):
         = ElectionSeason.objects.filter(status="INITIATED").first()
     # Flag if voter has already voted for this election season
     has_already_voted = False
-    if request.user and current_election_season:
+    if request.user.is_authenticated and current_election_season:
         has_already_voted \
             = Ballot.objects.filter(election_season=current_election_season,
                               voter=request.user).first() != None
@@ -29,12 +28,18 @@ def index(request):
                    'has_already_voted': has_already_voted})
 
 
-@login_required
 def vote_step_first(request):
     """
     First step of the voting process. Displays and processes the
     voter's college.
     """
+
+    # Check if logged in
+    # TODO: Refactor to a decorator
+    if not request.user.is_authenticated:
+        messages.add_message(request, messages.WARNING,
+        'Login first to your Microsoft Webmail account prior to voting.')
+        return redirect(reverse('elections:index'))
 
     # Check first if there is an existing election season
     current_election_season \
@@ -70,12 +75,16 @@ def vote_step_first(request):
                   {'college_choice_form': college_choice_form})
 
 
-@login_required
 def vote_step_second(request):
     """
     Second step of the voting process. Displays and processes the
     voter's ballot.
     """
+    # TODO: Refactor to a decorator
+    if not request.user.is_authenticated:
+        messages.add_message(request, messages.WARNING,
+        'Login first to your Microsoft Webmail account prior to voting.')
+        return redirect(reverse('elections:index'))
 
     # Check first if there is an existing election season
     current_election_season \
