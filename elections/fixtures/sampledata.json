@@ -21,7 +21,8 @@
     "fields": {
         "name": "President",
         "description": "",
-        "college": null
+        "college": null,
+        "to_fill": 1
     }
 },
 {
@@ -30,7 +31,8 @@
     "fields": {
         "name": "Vice President",
         "description": "",
-        "college": null
+        "college": null,
+        "to_fill": 1
     }
 },
 {
@@ -39,7 +41,8 @@
     "fields": {
         "name": "Councilor",
         "description": "",
-        "college": null
+        "college": null,
+        "to_fill": 8
     }
 },
 {
@@ -48,7 +51,8 @@
     "fields": {
         "name": "President",
         "description": "",
-        "college": 1
+        "college": 1,
+        "to_fill": 1
     }
 },
 {
@@ -57,7 +61,8 @@
     "fields": {
         "name": "Vice President",
         "description": "",
-        "college": 1
+        "college": 1,
+        "to_fill": 1
     }
 },
 {
@@ -66,7 +71,8 @@
     "fields": {
         "name": "President",
         "description": "",
-        "college": 2
+        "college": 2,
+        "to_fill": 1
     }
 },
 {
@@ -75,7 +81,8 @@
     "fields": {
         "name": "Vice President",
         "description": "",
-        "college": 2
+        "college": 2,
+        "to_fill": 1
     }
 },
 {

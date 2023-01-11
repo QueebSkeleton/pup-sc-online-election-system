@@ -24,6 +24,7 @@ class GovernmentPosition(models.Model):
     description = models.TextField(null=True, blank=True)
     college = models.ForeignKey(
         to=College, on_delete=models.PROTECT, null=True, blank=True)
+    to_fill = models.PositiveSmallIntegerField()
 
     def __str__(self):
         return f'{self.college.name + " - " if self.college else ""}{self.name}'
