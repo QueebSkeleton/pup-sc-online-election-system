@@ -70,13 +70,13 @@ class RunningCandidateTabularInline(admin.TabularInline):
 @admin.register(models.ElectionSeason)
 class ElectionSeasonModelAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on',
-                    'manage', 'override',)
+                    'manage_links', 'refresh_winners_link',)
 
     fields = ('academic_year',)
     inlines = [OfferedPositionTabularInline, RunningCandidateTabularInline, ]
 
-    @admin.display()
-    def manage(self, obj):
+    @admin.display(description='Manage')
+    def manage_links(self, obj):
         if not obj.status:
             return mark_safe(
                 f'<a href="{obj.id}/initiate/"'
@@ -87,13 +87,18 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                 f'<a href="{obj.id}/conclude/"'
                 f'onclick="return confirm(\'Conclude election season {obj}?\')"'
                 '>Conclude</a>')
+        elif obj.status == "CONCLUDED":
+            return mark_safe(f'<a href="{obj.id}/results/">View Results</a>')
         else:
             return "N/A"
 
-    @admin.display()
-    def override(self, obj):
+    @admin.display(description='Refresh winners')
+    def refresh_winners_link(self, obj):
         if obj.status == "CONCLUDED":
-            return mark_safe(f'<a href="{obj.id}/override/">Override</a>')
+            return mark_safe(
+                f'<a href="{obj.id}/refresh-winners/"'
+                f'onclick="return confirm(\'Refresh winners of election season {obj}?\')"'
+                '>Refresh</a>')
         else:
             return "N/A"
 
@@ -104,8 +109,10 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                  self.admin_site.admin_view(self.initiate_season_view)),
             path('<int:pk>/conclude/',
                  self.admin_site.admin_view(self.conclude_season_view)),
-            path('<int:pk>/statistics/',
-                 self.admin_site.admin_view(self.season_statistics_view)),
+            path('<int:pk>/refresh-winners/',
+                 self.admin_site.admin_view(self.refresh_winners_view)),
+            path('<int:pk>/results/',
+                 self.admin_site.admin_view(self.results_season_view)),
         ] + super().get_urls()
         return urls
 
@@ -176,7 +183,7 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
 
                 # Override the winners if this candidate has more votes
                 elif tally[pos_winners[0].id].tallied_votes \
-                        > tally[running_candidate.id].tallied_votes:
+                        < tally[running_candidate.id].tallied_votes:
                     pos_winners.clear()
                     pos_winners.append(running_candidate)
 
@@ -246,6 +253,33 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                              f'Election Season {election_season} has been concluded.')
         return redirect(reverse('admin:elections_electionseason_changelist'))
 
-    def season_statistics_view(self, request, pk):
+    def refresh_winners_view(self, request, pk):
+        election_season = (models.ElectionSeason.objects.filter(pk=pk)
+                           .prefetch_related('offeredposition_set',
+                                             'offeredposition_set__government_position',
+                                             'offeredposition_set__government_position__college',
+                                             'runningcandidate_set',
+                                             'runningcandidate_set__candidate',
+                                             'runningcandidate_set__government_position',
+                                             'electionseasonwinningcandidate_set')[0])
+
+        # Extract tally
+        tally = {running_candidate.id: running_candidate
+                 for running_candidate
+                 in election_season.runningcandidate_set.all()}
+        # Get the winners
+        winners = self.get_winners(election_season, tally)
+
+        # Refresh the winners
+        election_season.electionseasonwinningcandidate_set.all().delete()
+        for winning_candidate in winners:
+            winning_candidate.save()
+
+        messages.add_message(request, messages.SUCCESS,
+                             f'Election Season {election_season} winners have been recalculated.')
+        return redirect(reverse('admin:elections_electionseason_changelist'))
+        
+
+    def results_season_view(self, request, pk):
         # TODO: Implement
         return JsonResponse({'helo': 'helo'})
