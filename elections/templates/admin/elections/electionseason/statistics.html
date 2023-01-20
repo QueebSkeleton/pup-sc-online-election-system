@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block content %}
+  <div class="g-d-c">
+    {% for position_summary in results %}
+      <div class="g-d-12 g-d-f">
+        <div class="grp-module">
+          <h2>{{ position_summary.position }}</h2>
+          {% for candidate_summary in position_summary.running_candidates %}
+            <div class="grp-row">
+              {{ candidate_summary.running_candidate.candidate.first_name }}
+              {{ candidate_summary.running_candidate.candidate.last_name }}
+              <p class="grp-actions">
+                {{ candidate_summary.running_candidate.tallied_votes }} votes
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="g-d-12 g-d-l">
+        <div class="grp-module">
+          <h2>Winners</h2>
+          {% for winning_candidate in position_summary.winning_candidates %}
+            <div class="grp-row">
+              {{ winning_candidate.candidate_name }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+{% endblock content %}

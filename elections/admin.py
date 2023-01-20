@@ -1,22 +1,20 @@
-from django.contrib import admin
-from django.utils.html import mark_safe
-from django.urls import path
+from django.contrib import admin, messages
 from django.forms import BaseInlineFormSet
-from django.http import JsonResponse
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.urls import reverse
+from django.shortcuts import redirect, render
+from django.urls import path, reverse
 from django.utils import timezone
+from django.utils.html import mark_safe
 
-from . import models
+from .models import College, GovernmentPosition, Candidate, OfferedPosition, \
+    RunningCandidate, ElectionSeason, ElectionSeasonWinningCandidate
 
 
-@admin.register(models.College)
+@admin.register(College)
 class CollegeModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
-@admin.register(models.GovernmentPosition)
+@admin.register(GovernmentPosition)
 class GovernmentPositionModelAdmin(admin.ModelAdmin):
     list_display = ('name', 'college_description', 'description',)
 
@@ -25,7 +23,7 @@ class GovernmentPositionModelAdmin(admin.ModelAdmin):
         return obj.college if obj.college else '- CENTRAL -'
 
 
-@admin.register(models.Candidate)
+@admin.register(Candidate)
 class CandidateModelAdmin(admin.ModelAdmin):
     list_display = ('student_number', 'college', 'party', 'name',)
 
@@ -36,18 +34,17 @@ class CandidateModelAdmin(admin.ModelAdmin):
 
 class OfferedPositionInlineFormset(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
-        positions = models.GovernmentPosition.objects.all()
+        positions = GovernmentPosition.objects.all()
         kwargs['initial'] = [
             {'government_position': government_position,
              'max_positions_to_fill': government_position.to_fill}
             for government_position in positions
         ]
-        print(kwargs['initial'])
         super(OfferedPositionInlineFormset, self).__init__(*args, **kwargs)
 
 
 class OfferedPositionTabularInline(admin.TabularInline):
-    model = models.OfferedPosition
+    model = OfferedPosition
     extra = 0
     min_num = 1
     formset = OfferedPositionInlineFormset
@@ -57,17 +54,17 @@ class OfferedPositionTabularInline(admin.TabularInline):
             return (super(OfferedPositionTabularInline, self)
                     .get_extra(request, obj, **kwargs))
 
-        count = models.GovernmentPosition.objects.count()
+        count = GovernmentPosition.objects.count()
         return count - 1 if count > 0 else 0
 
 
 class RunningCandidateTabularInline(admin.TabularInline):
-    model = models.RunningCandidate
+    model = RunningCandidate
     extra = 0
     min_num = 1
 
 
-@admin.register(models.ElectionSeason)
+@admin.register(ElectionSeason)
 class ElectionSeasonModelAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on',
                     'manage_links', 'refresh_winners_link',)
@@ -117,7 +114,7 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         return urls
 
     def initiate_season_view(self, request, pk):
-        election_season = models.ElectionSeason.objects.get(pk=pk)
+        election_season = ElectionSeason.objects.get(pk=pk)
 
         # If status is past initiation, then do nothing.
         if election_season.status != None:
@@ -130,7 +127,7 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
 
         # Check if another election season is initiated.
         another_initiated_season \
-            = models.ElectionSeason.objects.filter(status='INITIATED').first()
+            = ElectionSeason.objects.filter(status='INITIATED').first()
         if another_initiated_season:
             messages.add_message(
                 request, messages.WARNING,
@@ -204,7 +201,7 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                 candidate_name = f'{candidate.first_name} ' \
                     f'{candidate.last_name}'
 
-                winning_candidate = models.ElectionSeasonWinningCandidate(
+                winning_candidate = ElectionSeasonWinningCandidate(
                     election_season=election_season,
                     running_candidate=winning_candidate,
                     position_name=position_name,
@@ -215,7 +212,7 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         return winners
 
     def conclude_season_view(self, request, pk):
-        election_season = (models.ElectionSeason.objects.filter(pk=pk)
+        election_season = (ElectionSeason.objects.filter(pk=pk)
                            .prefetch_related('ballot_set',
                                              'ballot_set__voted_candidates',
                                              'offeredposition_set',
@@ -254,7 +251,7 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         return redirect(reverse('admin:elections_electionseason_changelist'))
 
     def refresh_winners_view(self, request, pk):
-        election_season = (models.ElectionSeason.objects.filter(pk=pk)
+        election_season = (ElectionSeason.objects.filter(pk=pk)
                            .prefetch_related('offeredposition_set',
                                              'offeredposition_set__government_position',
                                              'offeredposition_set__government_position__college',
@@ -278,8 +275,52 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         messages.add_message(request, messages.SUCCESS,
                              f'Election Season {election_season} winners have been recalculated.')
         return redirect(reverse('admin:elections_electionseason_changelist'))
-        
 
     def results_season_view(self, request, pk):
-        # TODO: Implement
-        return JsonResponse({'helo': 'helo'})
+        election_season = ElectionSeason.objects.get(pk=pk)
+
+        # Construct a results list, structured like the ff:
+        # [
+        #   { position: GovernmentPosition obj,
+        #     running_candidates: [
+        #       { running_candidate: RunningCandidate,
+        #         vote_percentage: float },
+        #       { ... next candidate }
+        #     ],
+        #     winning_candidates: [ WinningCandidate obj, ... ]
+        #   },
+        #   { ... next position candidates and winners }
+        # ]
+        results = []
+
+        for offered_position in election_season.offeredposition_set.all():
+            position_summary = {
+                'position': offered_position.government_position,
+                'running_candidates': []
+            }
+
+            running_candidates_for_pos = \
+                (election_season.runningcandidate_set.filter(
+                    government_position=offered_position.government_position))
+            # Get the total votes
+            total = 0
+            for running_candidate in running_candidates_for_pos:
+                total += running_candidate.tallied_votes
+            # Plug each candidate to the summary
+            # with the candidate's percentage of votes garnered
+            for running_candidate in running_candidates_for_pos:
+                vote_percentage = running_candidate.tallied_votes / total
+                position_summary['running_candidates'].append({
+                    'running_candidate': running_candidate,
+                    'vote_percentage': vote_percentage
+                })
+            # Plug each winning candidate to the summary
+            position_summary['winning_candidates'] = \
+                list(election_season.electionseasonwinningcandidate_set.filter(
+                    running_candidate__government_position=offered_position.government_position))
+
+            results.append(position_summary)
+
+        return render(request, 'admin/elections/electionseason/statistics.html',
+                      {"title": f"Results of Election Season {election_season}",
+                       "results": results})
