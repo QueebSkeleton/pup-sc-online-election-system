@@ -99,6 +99,9 @@ class RunningCandidate(models.Model):
     disqualification_reason = models.TextField(null=True, blank=True)
     tallied_votes = models.PositiveIntegerField(null=True, blank=True)
 
+    def __str__(self):
+        return f'#{self.ballot_number} - {self.candidate.first_name} {self.candidate.last_name}'
+
 
 class Ballot(models.Model):
     """

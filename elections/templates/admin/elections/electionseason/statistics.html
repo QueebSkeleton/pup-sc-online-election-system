@@ -1,4 +1,23 @@
 {% extends "admin/base.html" %}
+{% block breadcrumbs %}
+  {% if not is_popup %}
+    <ul>
+      <li>
+        <a href="{% url 'admin:index' %}">Home</a>
+      </li>
+      <li>
+        <a href="{% url 'admin:app_list' 'elections' %}">Elections</a>
+      </li>
+      <li>
+        <a href="{% url 'admin:elections_electionseason_changelist' %}">Election Seasons</a>
+      </li>
+      <li>
+        <a href="{% url 'admin:elections_electionseason_change' object_id=election_season.id %}">{{ election_season }}</a>
+      </li>
+      <li>Results</li>
+    </ul>
+  {% endif %}
+{% endblock breadcrumbs %}
 {% block content %}
   <div class="g-d-c">
     {% for position_summary in results %}
@@ -9,9 +28,7 @@
             <div class="grp-row">
               {{ candidate_summary.running_candidate.candidate.first_name }}
               {{ candidate_summary.running_candidate.candidate.last_name }}
-              <p class="grp-actions">
-                {{ candidate_summary.running_candidate.tallied_votes }} votes
-              </p>
+              <p class="grp-actions">{{ candidate_summary.running_candidate.tallied_votes }} votes</p>
             </div>
           {% endfor %}
         </div>
@@ -20,12 +37,10 @@
         <div class="grp-module">
           <h2>Winners</h2>
           {% for winning_candidate in position_summary.winning_candidates %}
-            <div class="grp-row">
-              {{ winning_candidate.candidate_name }}
-            </div>
+            <div class="grp-row">{{ winning_candidate.candidate_name }}</div>
           {% endfor %}
         </div>
       </div>
     {% endfor %}
-    </div>
+  </div>
 {% endblock content %}

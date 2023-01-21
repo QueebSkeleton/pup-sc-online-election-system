@@ -118,7 +118,8 @@ def vote_step_second(request):
     # If method is GET, initialize the voting form
     if request.method == 'GET':
         voting_form = VotingForm(election_season=current_election_season,
-                                 college=college)
+                                 college=college,
+                                 use_custom_candidate_field=True)
 
     # Otherwise, process the form submitted
     else:

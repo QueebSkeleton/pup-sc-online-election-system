@@ -1,12 +1,15 @@
 from django.contrib import admin, messages
-from django.forms import BaseInlineFormSet
 from django.shortcuts import redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import mark_safe
 
+from django.contrib.auth import models as auth_models
+
 from .models import College, GovernmentPosition, Candidate, OfferedPosition, \
-    RunningCandidate, ElectionSeason, ElectionSeasonWinningCandidate
+    RunningCandidate, ElectionSeason, ElectionSeasonWinningCandidate, Ballot
+
+from . forms import ManualEntryPreliminaryForm, VotingForm
 
 
 @admin.register(College)
@@ -32,30 +35,10 @@ class CandidateModelAdmin(admin.ModelAdmin):
         return "%s %s" % (obj.first_name, obj.last_name)
 
 
-class OfferedPositionInlineFormset(BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        positions = GovernmentPosition.objects.all()
-        kwargs['initial'] = [
-            {'government_position': government_position,
-             'max_positions_to_fill': government_position.to_fill}
-            for government_position in positions
-        ]
-        super(OfferedPositionInlineFormset, self).__init__(*args, **kwargs)
-
-
 class OfferedPositionTabularInline(admin.TabularInline):
     model = OfferedPosition
     extra = 0
     min_num = 1
-    formset = OfferedPositionInlineFormset
-
-    def get_extra(self, request, obj=None, **kwargs):
-        if obj:
-            return (super(OfferedPositionTabularInline, self)
-                    .get_extra(request, obj, **kwargs))
-
-        count = GovernmentPosition.objects.count()
-        return count - 1 if count > 0 else 0
 
 
 class RunningCandidateTabularInline(admin.TabularInline):
@@ -67,7 +50,7 @@ class RunningCandidateTabularInline(admin.TabularInline):
 @admin.register(ElectionSeason)
 class ElectionSeasonModelAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on',
-                    'manage_links', 'refresh_winners_link',)
+                    'manual_entry_link', 'manage_links', 'refresh_winners_link',)
 
     fields = ('academic_year',)
     inlines = [OfferedPositionTabularInline, RunningCandidateTabularInline, ]
@@ -82,10 +65,17 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         elif obj.status == "INITIATED":
             return mark_safe(
                 f'<a href="{obj.id}/conclude/"'
-                f'onclick="return confirm(\'Conclude election season {obj}?\')"'
-                '>Conclude</a>')
+                f'onclick="return confirm(\'Conclude election season {obj}?\')">'
+                f'Conclude</a>')
         elif obj.status == "CONCLUDED":
             return mark_safe(f'<a href="{obj.id}/results/">View Results</a>')
+        else:
+            return "N/A"
+
+    @admin.display(description='Manual Entry')
+    def manual_entry_link(self, obj):
+        if obj.status == "INITIATED":
+            return mark_safe(f'<a href="{obj.id}/ballot/step-1/">Manual Entry</a>')
         else:
             return "N/A"
 
@@ -104,6 +94,10 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         urls = [
             path('<int:pk>/initiate/',
                  self.admin_site.admin_view(self.initiate_season_view)),
+            path('<int:pk>/ballot/step-1/',
+                 self.admin_site.admin_view(self.manual_entry_first_step_view)),
+            path('<int:pk>/ballot/step-2/',
+                 self.admin_site.admin_view(self.manual_entry_second_step_view)),
             path('<int:pk>/conclude/',
                  self.admin_site.admin_view(self.conclude_season_view)),
             path('<int:pk>/refresh-winners/',
@@ -143,6 +137,77 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                              f'Election Season {election_season} has been initiated.')
         return redirect(
             reverse('admin:elections_electionseason_changelist'))
+
+    def manual_entry_first_step_view(self, request, pk):
+        if request.method == 'POST':
+            form = ManualEntryPreliminaryForm(request.POST)
+
+            if form.is_valid():
+                data = form.cleaned_data
+                response = redirect("../step-2/")
+                response['Location'] += '?voter_id=' + str(data['voter'].id) \
+                    + "&college_id=" + str(data['college_of_voter'].id)
+                return response
+
+        else:
+            form = ManualEntryPreliminaryForm()
+
+        election_season = ElectionSeason.objects.get(pk=pk)
+        return render(request, 'admin/elections/electionseason/manual_entry_first_step.html',
+                      {'title': 'Manual Entry First Step',
+                       'election_season': election_season, 'form': form})
+
+    def manual_entry_second_step_view(self, request, pk):
+        if not all(key in request.GET for key in ['voter_id', 'college_id']):
+            return redirect('../step-1/')
+
+        election_season = (ElectionSeason.objects.prefetch_related(
+            "offeredposition_set",
+            "offeredposition_set__government_position",
+            "offeredposition_set__government_position__college",
+            "runningcandidate_set",
+            "runningcandidate_set__candidate",
+            "runningcandidate_set__government_position")
+            .get(pk=pk))
+        voter = auth_models.User.objects.get(pk=request.GET.get('voter_id'))
+        college = College.objects.get(pk=request.GET.get('college_id'))
+
+        # Check if inputted user already has a ballot.
+        if Ballot.objects.filter(election_season=election_season,
+                                 voter=voter).first() != None:
+            messages.add_message(request, messages.WARNING,
+                f'User {voter} has already casted its votes for this election.')
+            return redirect(reverse("admin:elections_electionseason_changelist"))
+
+        if request.method == 'GET':
+            voting_form = VotingForm(election_season=election_season,
+                                     college=college)
+
+        elif request.method == 'POST':
+            voting_form = VotingForm(request.POST, college=college,
+                                     election_season=election_season)
+
+            if voting_form.is_valid():
+                # Extract all voted candidates from form
+                voted_candidates = [voted_candidate for position_candidates
+                                    in list(voting_form.cleaned_data.values())
+                                    for voted_candidate in position_candidates]
+
+                # Construct then save the ballot object
+                ballot = Ballot(election_season=election_season,
+                                voter=voter,
+                                casted_on=timezone.now())
+                ballot.save()
+                # Set the voted candidates of this ballot then trigger another save
+                ballot.voted_candidates.add(*voted_candidates)
+                # Add message
+                messages.add_message(request, messages.SUCCESS,
+                                     f'Ballot for user {ballot.voter} has been saved.')
+                return redirect(reverse("admin:elections_electionseason_changelist"))
+
+        return render(request, 'admin/elections/electionseason/manual_entry_second_step.html',
+                      {'election_season': election_season,
+                       'voting_form': voting_form})
 
     def get_tally(self, election_season):
         # Initialize tally to 0 votes per candidate
@@ -323,4 +388,4 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
 
         return render(request, 'admin/elections/electionseason/statistics.html',
                       {"title": f"Results of Election Season {election_season}",
-                       "results": results})
+                       "election_season": election_season, "results": results})
