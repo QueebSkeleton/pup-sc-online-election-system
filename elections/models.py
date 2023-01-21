@@ -97,7 +97,7 @@ class RunningCandidate(models.Model):
     ballot_number = models.PositiveSmallIntegerField()
     is_disqualified = models.BooleanField()
     disqualification_reason = models.TextField(null=True, blank=True)
-    tallied_votes = models.PositiveIntegerField(null=True, blank=True)
+    tallied_votes = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f'#{self.ballot_number} - {self.candidate.first_name} {self.candidate.last_name}'

@@ -315,7 +315,7 @@
         "ballot_number": 1,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -328,7 +328,7 @@
         "ballot_number": 2,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -341,7 +341,7 @@
         "ballot_number": 1,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -354,7 +354,7 @@
         "ballot_number": 2,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -367,7 +367,7 @@
         "ballot_number": 1,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -380,7 +380,7 @@
         "ballot_number": 2,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -393,7 +393,7 @@
         "ballot_number": 1,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -406,7 +406,7 @@
         "ballot_number": 2,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -419,7 +419,7 @@
         "ballot_number": 1,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -432,7 +432,7 @@
         "ballot_number": 2,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -445,7 +445,7 @@
         "ballot_number": 1,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 },
 {
@@ -458,7 +458,7 @@
         "ballot_number": 2,
         "is_disqualified": false,
         "disqualification_reason": "",
-        "tallied_votes": null
+        "tallied_votes": 0
     }
 }
 ]

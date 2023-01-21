@@ -11,6 +11,8 @@ from .models import College, GovernmentPosition, Candidate, OfferedPosition, \
 
 from . forms import ManualEntryPreliminaryForm, VotingForm
 
+import random
+
 
 @admin.register(College)
 class CollegeModelAdmin(admin.ModelAdmin):
@@ -227,6 +229,14 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
 
     def get_winners(self, election_season, tally):
         winners = []
+        # While calculating the winners, ties are inevitable.
+        # The tiebreaking enforced in here is a random.choice
+        # which is the same as simulating a real-life coin toss done by most states.
+        # The chosen winner's tallied votes will be increased by one 
+        # just so the system easily recognizes it as the winner.
+        # The candidates with updated tallies will be stored in this variable,
+        # which should be saved by the caller.
+        candidates_to_update = []
 
         for offered_position in election_season.offeredposition_set.all():
             candidates_for_pos = election_season.runningcandidate_set.filter(
@@ -249,32 +259,40 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                     pos_winners.clear()
                     pos_winners.append(running_candidate)
 
-            # Construct objects for each winner,
-            # then add to the final list of winners
-            for winning_candidate in pos_winners:
-                government_position = offered_position.government_position
-                # Student council name
-                student_council \
-                    = "CENTRAL" if not government_position.college \
-                    else government_position.college.name
-                # Position name
-                position_name = f'{student_council} - ' \
-                                f'{offered_position.government_position.name}'
+            # If there are ties, randomly pick a winner
+            # (like simulating a real-life toin coss for tiebreaking)
+            # TODO: Consult this with an elections expert of the conducting state
+            if len(pos_winners) > 1:
+                pos_winner = random.choice(pos_winners)
+                pos_winner.tallied_votes += 1
+                candidates_to_update.append(pos_winner)
+            else:
+                pos_winner = pos_winners[0]
 
-                # Candidate name
-                candidate = winning_candidate.candidate
-                candidate_name = f'{candidate.first_name} ' \
-                    f'{candidate.last_name}'
+            # Save the winner
+            government_position = offered_position.government_position
+            # Student council name
+            student_council \
+                = "CENTRAL" if not government_position.college \
+                else government_position.college.name
+            # Position name
+            position_name = f'{student_council} - ' \
+                            f'{offered_position.government_position.name}'
 
-                winning_candidate = ElectionSeasonWinningCandidate(
-                    election_season=election_season,
-                    running_candidate=winning_candidate,
-                    position_name=position_name,
-                    ballot_number=winning_candidate.ballot_number,
-                    candidate_name=candidate_name)
-                winners.append(winning_candidate)
+            # Candidate name
+            candidate = pos_winner.candidate
+            candidate_name = f'{candidate.first_name} ' \
+                f'{candidate.last_name}'
 
-        return winners
+            winning_candidate = ElectionSeasonWinningCandidate(
+                election_season=election_season,
+                running_candidate=pos_winner,
+                position_name=position_name,
+                ballot_number=pos_winner.ballot_number,
+                candidate_name=candidate_name)
+            winners.append(winning_candidate)
+
+        return winners, candidates_to_update
 
     def conclude_season_view(self, request, pk):
         election_season = (ElectionSeason.objects.filter(pk=pk)
@@ -302,12 +320,16 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
 
         # Tally the results then merge it to the objects
         tally = self.get_tally(election_season)
-        # Get the winners
-        winners = self.get_winners(election_season, tally)
+        # Get the winners while resolving ties
+        winners, candidates_to_update = self.get_winners(election_season, tally)
 
-        # Save the tally and winners
+        # Save the tally
         for running_candidate in tally.values():
             running_candidate.save()
+        # After resolving the ties, reupdate the candidate tallies
+        for running_candidate in candidates_to_update:
+            running_candidate.save()
+        # Save the winners
         for winning_candidate in winners:
             winning_candidate.save()
 
@@ -330,10 +352,12 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                  for running_candidate
                  in election_season.runningcandidate_set.all()}
         # Get the winners
-        winners = self.get_winners(election_season, tally)
+        winners, candidates_to_update = self.get_winners(election_season, tally)
 
         # Refresh the winners
         election_season.electionseasonwinningcandidate_set.all().delete()
+        for running_candidate in candidates_to_update:
+            running_candidate.save()
         for winning_candidate in winners:
             winning_candidate.save()
 
