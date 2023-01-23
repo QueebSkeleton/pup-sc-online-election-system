@@ -100,7 +100,9 @@ class RunningCandidate(models.Model):
     tallied_votes = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'#{self.ballot_number} - {self.candidate.first_name} {self.candidate.last_name}'
+        return (f'#{self.ballot_number} - '
+                f'{self.candidate.first_name} '
+                f'{self.candidate.last_name}')
 
 
 class Ballot(models.Model):

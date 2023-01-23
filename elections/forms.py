@@ -44,7 +44,8 @@ class VotingForm(forms.Form):
     def __init__(self, *args, **kwargs):
         election_season = kwargs.pop('election_season')
         voter_college = kwargs.pop('college')
-        use_custom_candidate_field = kwargs.pop('use_custom_candidate_field', False)
+        use_custom_candidate_field = kwargs.pop('use_custom_candidate_field',
+                                                False)
 
         super().__init__(*args, **kwargs)
 
@@ -76,8 +77,10 @@ class VotingForm(forms.Form):
                         + " - " + offered_position.government_position.name
 
                     self.fields[field_name] \
-                        = (CandidateMultipleChoiceField(queryset=candidates_queryset)
+                        = (CandidateMultipleChoiceField(
+                            queryset=candidates_queryset)
                            if use_custom_candidate_field else
-                           forms.ModelMultipleChoiceField(queryset=candidates_queryset))
+                           forms.ModelMultipleChoiceField(
+                            queryset=candidates_queryset))
 
                     self.fields[field_name].label = field_label

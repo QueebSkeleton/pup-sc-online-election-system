@@ -7,7 +7,8 @@ from django.contrib import messages
 from .forms import VoteCollegeChoiceForm, VotingForm
 from .models import ElectionSeason, College, RunningCandidate, Ballot
 
-# TODO: Use view decorators for checking for current election season, and if voter has voted.
+# TODO: Use view decorators for checking for current election season,
+#       and if voter has voted.
 
 
 def index(request):
@@ -137,7 +138,8 @@ def vote_step_second(request):
                             voter=request.user,
                             casted_on=timezone.now())
             ballot.save()
-            # Set the voted candidates of this ballot then trigger another save
+            # Set the voted candidates of this ballot
+            # then trigger another save
             ballot.voted_candidates.set(voted_candidates)
             ballot.save()
             # TODO: Validate signature with public key

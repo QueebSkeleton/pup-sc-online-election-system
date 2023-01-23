@@ -52,7 +52,8 @@ class RunningCandidateTabularInline(admin.TabularInline):
 @admin.register(ElectionSeason)
 class ElectionSeasonModelAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on',
-                    'manual_entry_link', 'manage_links', 'refresh_winners_link',)
+                    'manual_entry_link', 'manage_links',
+                    'refresh_winners_link',)
 
     fields = ('academic_year',)
     inlines = [OfferedPositionTabularInline, RunningCandidateTabularInline, ]
@@ -77,7 +78,8 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
     @admin.display(description='Manual Entry')
     def manual_entry_link(self, obj):
         if obj.status == "INITIATED":
-            return mark_safe(f'<a href="{obj.id}/ballot/step-1/">Manual Entry</a>')
+            return mark_safe(
+                f'<a href="{obj.id}/ballot/step-1/">Manual Entry</a>')
         else:
             return "N/A"
 
@@ -86,8 +88,8 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         if obj.status == "CONCLUDED":
             return mark_safe(
                 f'<a href="{obj.id}/refresh-winners/"'
-                f'onclick="return confirm(\'Refresh winners of election season {obj}?\')"'
-                '>Refresh</a>')
+                f'onclick="return confirm(\'Refresh winners'
+                f'of election season {obj}?\')">Refresh</a>')
         else:
             return "N/A"
 
@@ -95,17 +97,23 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         # TODO: Add views for initiating and concluding an election.
         urls = [
             path('<int:pk>/initiate/',
-                 self.admin_site.admin_view(self.initiate_season_view)),
+                 self.admin_site.admin_view(
+                     self.initiate_season_view)),
             path('<int:pk>/ballot/step-1/',
-                 self.admin_site.admin_view(self.manual_entry_first_step_view)),
+                 self.admin_site.admin_view(
+                     self.manual_entry_first_step_view)),
             path('<int:pk>/ballot/step-2/',
-                 self.admin_site.admin_view(self.manual_entry_second_step_view)),
+                 self.admin_site.admin_view(
+                     self.manual_entry_second_step_view)),
             path('<int:pk>/conclude/',
-                 self.admin_site.admin_view(self.conclude_season_view)),
+                 self.admin_site.admin_view(
+                     self.conclude_season_view)),
             path('<int:pk>/refresh-winners/',
-                 self.admin_site.admin_view(self.refresh_winners_view)),
+                 self.admin_site.admin_view(
+                     self.refresh_winners_view)),
             path('<int:pk>/results/',
-                 self.admin_site.admin_view(self.results_season_view)),
+                 self.admin_site.admin_view(
+                     self.results_season_view)),
         ] + super().get_urls()
         return urls
 
@@ -136,7 +144,8 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         election_season.save()
 
         messages.add_message(request, messages.SUCCESS,
-                             f'Election Season {election_season} has been initiated.')
+                             f'Election Season {election_season} '
+                             f'has been initiated.')
         return redirect(
             reverse('admin:elections_electionseason_changelist'))
 
@@ -147,17 +156,22 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
             if form.is_valid():
                 data = form.cleaned_data
                 response = redirect("../step-2/")
-                response['Location'] += '?voter_id=' + str(data['voter'].id) \
-                    + "&college_id=" + str(data['college_of_voter'].id)
+                response['Location'] += (
+                    '?voter_id='
+                    + str(data['voter'].id)
+                    + "&college_id="
+                    + str(data['college_of_voter'].id))
                 return response
 
         else:
             form = ManualEntryPreliminaryForm()
 
         election_season = ElectionSeason.objects.get(pk=pk)
-        return render(request, 'admin/elections/electionseason/manual_entry_first_step.html',
-                      {'title': 'Manual Entry First Step',
-                       'election_season': election_season, 'form': form})
+        return render(
+            request,
+            'admin/elections/electionseason/manual_entry_first_step.html',
+            {'title': 'Manual Entry First Step',
+             'election_season': election_season, 'form': form})
 
     def manual_entry_second_step_view(self, request, pk):
         if not all(key in request.GET for key in ['voter_id', 'college_id']):
@@ -177,9 +191,12 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         # Check if inputted user already has a ballot.
         if Ballot.objects.filter(election_season=election_season,
                                  voter=voter).first() != None:
-            messages.add_message(request, messages.WARNING,
-                f'User {voter} has already casted its votes for this election.')
-            return redirect(reverse("admin:elections_electionseason_changelist"))
+            messages.add_message(
+                request, messages.WARNING,
+                f'User {voter} has already casted '
+                f'its votes for this election.')
+            return redirect(
+                reverse("admin:elections_electionseason_changelist"))
 
         if request.method == 'GET':
             voting_form = VotingForm(election_season=election_season,
@@ -193,23 +210,28 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                 # Extract all voted candidates from form
                 voted_candidates = [voted_candidate for position_candidates
                                     in list(voting_form.cleaned_data.values())
-                                    for voted_candidate in position_candidates]
+                                    for voted_candidate
+                                    in position_candidates]
 
                 # Construct then save the ballot object
                 ballot = Ballot(election_season=election_season,
                                 voter=voter,
                                 casted_on=timezone.now())
                 ballot.save()
-                # Set the voted candidates of this ballot then trigger another save
+                # Set the voted candidates of this ballot
+                # then trigger another save
                 ballot.voted_candidates.add(*voted_candidates)
                 # Add message
-                messages.add_message(request, messages.SUCCESS,
-                                     f'Ballot for user {ballot.voter} has been saved.')
-                return redirect(reverse("admin:elections_electionseason_changelist"))
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    f'Ballot for user {ballot.voter} has been saved.')
+                return redirect(
+                    reverse("admin:elections_electionseason_changelist"))
 
-        return render(request, 'admin/elections/electionseason/manual_entry_second_step.html',
-                      {'election_season': election_season,
-                       'voting_form': voting_form})
+        return render(
+            request,
+            'admin/elections/electionseason/manual_entry_second_step.html',
+            {'election_season': election_season, 'voting_form': voting_form})
 
     def get_tally(self, election_season):
         # Initialize tally to 0 votes per candidate
@@ -231,8 +253,8 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         winners = []
         # While calculating the winners, ties are inevitable.
         # The tiebreaking enforced in here is a random.choice
-        # which is the same as simulating a real-life coin toss done by most states.
-        # The chosen winner's tallied votes will be increased by one 
+        # which is the same as a real-life coin toss done by most states.
+        # The chosen winner's tallied votes will be increased by one
         # just so the system easily recognizes it as the winner.
         # The candidates with updated tallies will be stored in this variable,
         # which should be saved by the caller.
@@ -261,7 +283,8 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
 
             # If there are ties, randomly pick a winner
             # (like simulating a real-life toin coss for tiebreaking)
-            # TODO: Consult this with an elections expert of the conducting state
+            # TODO: Consult with an elections expert
+            #       of the conducting state
             if len(pos_winners) > 1:
                 pos_winner = random.choice(pos_winners)
                 pos_winner.tallied_votes += 1
@@ -295,15 +318,17 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         return winners, candidates_to_update
 
     def conclude_season_view(self, request, pk):
-        election_season = (ElectionSeason.objects.filter(pk=pk)
-                           .prefetch_related('ballot_set',
-                                             'ballot_set__voted_candidates',
-                                             'offeredposition_set',
-                                             'offeredposition_set__government_position',
-                                             'offeredposition_set__government_position__college',
-                                             'runningcandidate_set',
-                                             'runningcandidate_set__candidate',
-                                             'runningcandidate_set__government_position')[0])
+        election_season = (
+            ElectionSeason.objects.filter(pk=pk)
+            .prefetch_related(
+                'ballot_set',
+                'ballot_set__voted_candidates',
+                'offeredposition_set',
+                'offeredposition_set__government_position',
+                'offeredposition_set__government_position__college',
+                'runningcandidate_set',
+                'runningcandidate_set__candidate',
+                'runningcandidate_set__government_position')[0])
 
         # If status is not 'INITIATED', do nothing.
         if election_season.status != 'INITIATED':
@@ -321,7 +346,8 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         # Tally the results then merge it to the objects
         tally = self.get_tally(election_season)
         # Get the winners while resolving ties
-        winners, candidates_to_update = self.get_winners(election_season, tally)
+        winners, candidates_to_update = self.get_winners(
+            election_season, tally)
 
         # Save the tally
         for running_candidate in tally.values():
@@ -333,26 +359,30 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         for winning_candidate in winners:
             winning_candidate.save()
 
-        messages.add_message(request, messages.SUCCESS,
-                             f'Election Season {election_season} has been concluded.')
+        messages.add_message(
+            request, messages.SUCCESS,
+            f'Election Season {election_season} has been concluded.')
         return redirect(reverse('admin:elections_electionseason_changelist'))
 
     def refresh_winners_view(self, request, pk):
-        election_season = (ElectionSeason.objects.filter(pk=pk)
-                           .prefetch_related('offeredposition_set',
-                                             'offeredposition_set__government_position',
-                                             'offeredposition_set__government_position__college',
-                                             'runningcandidate_set',
-                                             'runningcandidate_set__candidate',
-                                             'runningcandidate_set__government_position',
-                                             'electionseasonwinningcandidate_set')[0])
+        election_season = (
+            ElectionSeason.objects.filter(pk=pk)
+            .prefetch_related(
+                'offeredposition_set',
+                'offeredposition_set__government_position',
+                'offeredposition_set__government_position__college',
+                'runningcandidate_set',
+                'runningcandidate_set__candidate',
+                'runningcandidate_set__government_position',
+                'electionseasonwinningcandidate_set')[0])
 
         # Extract tally
         tally = {running_candidate.id: running_candidate
                  for running_candidate
                  in election_season.runningcandidate_set.all()}
         # Get the winners
-        winners, candidates_to_update = self.get_winners(election_season, tally)
+        winners, candidates_to_update = self.get_winners(
+            election_season, tally)
 
         # Refresh the winners
         election_season.electionseasonwinningcandidate_set.all().delete()
@@ -361,8 +391,10 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         for winning_candidate in winners:
             winning_candidate.save()
 
-        messages.add_message(request, messages.SUCCESS,
-                             f'Election Season {election_season} winners have been recalculated.')
+        messages.add_message(
+            request, messages.SUCCESS,
+            f'Election Season {election_season} '
+            f'winners have been recalculated.')
         return redirect(reverse('admin:elections_electionseason_changelist'))
 
     def results_season_view(self, request, pk):
@@ -383,14 +415,16 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
         results = []
 
         for offered_position in election_season.offeredposition_set.all():
+            govt_pos = offered_position.government_position
+
             position_summary = {
-                'position': offered_position.government_position,
+                'position': govt_pos,
                 'running_candidates': []
             }
 
             running_candidates_for_pos = \
                 (election_season.runningcandidate_set.filter(
-                    government_position=offered_position.government_position))
+                    government_position=govt_pos))
             # Get the total votes
             total = 0
             for running_candidate in running_candidates_for_pos:
@@ -405,11 +439,15 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
                 })
             # Plug each winning candidate to the summary
             position_summary['winning_candidates'] = \
-                list(election_season.electionseasonwinningcandidate_set.filter(
-                    running_candidate__government_position=offered_position.government_position))
+                list(election_season
+                     .electionseasonwinningcandidate_set
+                     .filter(
+                         running_candidate__government_position=govt_pos))
 
             results.append(position_summary)
 
-        return render(request, 'admin/elections/electionseason/statistics.html',
-                      {"title": f"Results of Election Season {election_season}",
-                       "election_season": election_season, "results": results})
+        return render(
+            request,
+            'admin/elections/electionseason/statistics.html',
+            {"title": f"Results of Election Season {election_season}",
+             "election_season": election_season, "results": results})
