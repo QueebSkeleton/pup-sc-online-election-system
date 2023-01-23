@@ -27,7 +27,8 @@ class GovernmentPosition(models.Model):
     to_fill = models.PositiveSmallIntegerField()
 
     def __str__(self):
-        return f'{self.college.name + " - " if self.college else ""}{self.name}'
+        return (f'{self.college.name if self.college else "CENTRAL"} - '
+                f'{self.name}')
 
     class Meta:
         verbose_name = 'Government Position'
@@ -111,6 +112,7 @@ class Ballot(models.Model):
     """
     election_season = models.ForeignKey(to=ElectionSeason,
                                         on_delete=models.PROTECT)
+    college = models.ForeignKey(to=College, on_delete=models.PROTECT)
     voter = models.ForeignKey(to=auth_models.User,
                               on_delete=models.PROTECT)
     voted_candidates = models.ManyToManyField(to=RunningCandidate)

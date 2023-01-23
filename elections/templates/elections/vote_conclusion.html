@@ -4,8 +4,8 @@
   <div class="container py-5">
     <h1 class="h3 text-center mb-4">Your vote has been submitted.</h1>
     <div class="text-center mb-3">
-      <a href="#"
-        class="btn btn-sm btn-primary">
+      <a href="{% url "elections:ballot_pdf_receipt" ballot_id %}"
+        class="btn btn-sm btn-primary" target="_blank">
         <i class="fa-solid fa-pdf"></i>
         Get PDF Receipt
       </a>

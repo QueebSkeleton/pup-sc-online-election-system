@@ -49,6 +49,23 @@ class RunningCandidateTabularInline(admin.TabularInline):
     min_num = 1
 
 
+@admin.register(Ballot)
+class BallotModelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'voter_name', 'election_season', 'casted_on',
+                    'receipt_link',)
+    search_fields = ('id', 'voter__first_name', 'voter__last_name',)
+
+    @admin.display(description='Voter Name')
+    def voter_name(self, obj):
+        return f"{obj.voter.first_name} {obj.voter.last_name}"
+
+    @admin.display(description='Receipt')
+    def receipt_link(self, obj):
+        pdf_link = reverse("elections:ballot_pdf_receipt",
+                           kwargs={"id": obj.id})
+        return mark_safe(f'<a href="{pdf_link}" target="_blank">PDF</a>')
+
+
 @admin.register(ElectionSeason)
 class ElectionSeasonModelAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'status', 'initiated_on', 'concluded_on',
@@ -215,6 +232,7 @@ class ElectionSeasonModelAdmin(admin.ModelAdmin):
 
                 # Construct then save the ballot object
                 ballot = Ballot(election_season=election_season,
+                                college=college,
                                 voter=voter,
                                 casted_on=timezone.now())
                 ballot.save()

@@ -1,11 +1,18 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.utils import timezone
 from django.contrib import messages
 
 from .forms import VoteCollegeChoiceForm, VotingForm
 from .models import ElectionSeason, College, RunningCandidate, Ballot
+
+import io
+
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
 # TODO: Use view decorators for checking for current election season,
 #       and if voter has voted.
@@ -135,6 +142,7 @@ def vote_step_second(request):
 
             # Construct then save the ballot object
             ballot = Ballot(election_season=current_election_season,
+                            college=college,
                             voter=request.user,
                             casted_on=timezone.now())
             ballot.save()
@@ -143,7 +151,8 @@ def vote_step_second(request):
             ballot.voted_candidates.set(voted_candidates)
             ballot.save()
             # TODO: Validate signature with public key
-            return render(request, 'elections/vote_conclusion.html', {})
+            return render(request, 'elections/vote_conclusion.html',
+                          {'ballot_id': ballot.id})
 
     return render(request, 'elections/vote_step_second.html',
                   {'voting_form': voting_form})
@@ -176,3 +185,76 @@ def confirm_selected_candidates(request):
             f"{running_candidate.candidate.last_name}")
 
     return JsonResponse(candidates_per_position)
+
+
+def ballot_pdf_receipt(request, id):
+    # Fetch the ballot
+    # TODO: Prefetch the needed related models
+    ballot = Ballot.objects.get(pk=id)
+    election_season = ballot.election_season
+
+    buffer = io.BytesIO()
+
+    styleSheet = getSampleStyleSheet()
+
+    flowables = []
+
+    # STYLES
+    headingStyle = styleSheet["Heading2"]
+    headingStyle.alignment = TA_CENTER
+    positionHeadingStyle = styleSheet["Heading3"]
+    positionHeadingStyle.fontSize = 10
+    normalCenterTextStyle = styleSheet["Normal"]
+    normalCenterTextStyle.alignment = TA_CENTER
+    helperTextStyle = styleSheet["Italic"]
+    helperTextStyle.fontSize = 6
+
+    # Header
+    flowables.append(Paragraph("PUP Student Council Elections",
+                               style=headingStyle))
+    flowables.append(Paragraph("Elections AY2022-2023",
+                               style=normalCenterTextStyle))
+    flowables.append(Spacer(0, 12))
+    # Voter Information
+    flowables.append(Paragraph(f"Voter: {ballot.voter.first_name} "
+                               f"{ballot.voter.last_name}"))
+    flowables.append(Spacer(0, 9))
+    # Ballot Information
+    flowables.append(Paragraph(f"Ballot #: {id}"))
+    flowables.append(Paragraph("We will use this to refer to your ballot "
+                               "in the system in case of problems.",
+                               style=helperTextStyle))
+    
+    for offeredpos in election_season.offeredposition_set.filter():
+        govtpos = offeredpos.government_position
+
+        if not (govtpos.college is None or govtpos.college == ballot.college):
+            continue
+
+        voted_candidates_for_pos = (ballot.voted_candidates
+                                    .filter(government_position=govtpos))
+
+        # Output position header
+        flowables.append(Paragraph(str(offeredpos.government_position),
+                                   style=positionHeadingStyle))
+        # Output voted candidates
+        for voted_candidate in voted_candidates_for_pos:
+            flowables.append(Paragraph(str(voted_candidate)))
+
+        # Output -undervoted- if user has undervoted
+        needed = offeredpos.max_positions_to_fill
+        voted = voted_candidates_for_pos.count()
+        for i in range(needed - voted):
+            flowables.append(Paragraph(f"--undervoted--"))
+
+    doc = SimpleDocTemplate(buffer,
+                            title="Student Ballot",
+                            pagesize=(269, 600),
+                            leftMargin=10,
+                            rightMargin=10,
+                            topMargin=10,
+                            bottomMargin=10)
+    doc.build(flowables)
+
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=False, filename="ballot.pdf")

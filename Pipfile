@@ -11,6 +11,7 @@ python-dotenv = "*"
 social-auth-app-django = "*"
 django-grappelli = "*"
 django-widget-tweaks = "*"
+reportlab = "*"
 
 [dev-packages]
 autopep8 = "*"
