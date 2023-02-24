@@ -62,7 +62,8 @@ class VotingForm(forms.Form):
                 candidates_queryset \
                     = (election_season.runningcandidate_set
                        .filter(government_position=offered_position
-                               .government_position))
+                               .government_position,
+                               is_disqualified=False))
 
                 if candidates_queryset.count() > 0:
                     field_name \

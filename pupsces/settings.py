@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+from django.urls import reverse_lazy
 import os
 
 # Load .env file
@@ -140,7 +141,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/vote/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = reverse_lazy("elections:vote_step_first")
 
 
 # Internationalization
